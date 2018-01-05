@@ -36,13 +36,20 @@ appium遵从C/S模型：
     - 返回Driver实例
     
 - 用例管理
-    - 不同设备类型
-    - 不同版本
-    - 不同APP
-        - 控件管理（JSON or DB）
-        - API（PageObject）
-        - Case
-        - API封装控件与操作，Case完全由API组合
+    - 由于使用场景千差万别，有的人可能需要适配多设备，而有的人需要适配多APP
+    - 考虑到该部分的改动不会太频繁，决定不进行自动加载以赋予更高的可定制性
+    - 所以此处设计为 
+        - 用一个映射表将配置与相应case文件夹与API文件夹链接起来
+        - 映射表需要在conf.py中自行配置
+    
+    - 一个case分配的例子
+        - 不同设备类型
+        - 不同版本
+        - 不同APP
+            - 控件管理（JSON or DB）
+            - API（PageObject）
+            - Case
+            - API封装控件与操作，Case完全由API组合
         
 - 用例执行
     - unittest为单位
@@ -64,10 +71,21 @@ appium遵从C/S模型：
             - adb操作类
 - result
     - 测试结果会被保存在这里
+    - 测试结果文件夹命名为时间+机型id
+    - 包含：
+        - 错误截图
+        - anrlog
+        - 测试报告（htmltestrunner生成）
+        - 控制台上的log
+        - 手机log（MTK/QC等）
 - case
     - 测试用例的位置
+    - 根据自己需要创建文件夹结构
+    - 在conf.py中进行配置
 - api
     - 测试用例需要使用的api位置
+    - 根据自己需要创建文件夹结构
+    - 在conf.py中进行配置
 - conf.py
     - 全局配置
 - run.py
