@@ -17,7 +17,7 @@ class AppiumClient(object):
         self.stop()
 
     def start(self):
-        # TODO: use case
+        # TODO: use cases
         # do something
         self.driver.swipe(100, 100, 200, 200, 500)
 
