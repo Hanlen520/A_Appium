@@ -51,9 +51,17 @@ appium遵从C/S模型：
 ## 文件结构 ##
 
 - appium_client  
-    - 原有appium_client包
-    - appium_server.py用于管理后台的server进程
-    - 构建driver对象需要的其他
+    - appium
+        - 原有appium_client包
+    - appium_server.py
+        - 用于管理后台的server进程
+    - appium_client.py
+        - appium客户端类，与server通信
+    - device包
+        - device.py 
+            - device对象，包含了设备的相关信息
+        - adb.py 
+            - adb操作类
 - result
     - 测试结果会被保存在这里
 - case

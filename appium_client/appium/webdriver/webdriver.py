@@ -12,8 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
-from appium.webdriver.common.multi_action import MultiAction
-from appium.webdriver.common.touch_action import TouchAction
+# change by williamfzc
+from .common.multi_action import MultiAction
+from .common.touch_action import TouchAction
+
 from selenium import webdriver
 from selenium.common.exceptions import TimeoutException
 from selenium.webdriver.common.by import By

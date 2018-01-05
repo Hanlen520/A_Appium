@@ -1,0 +1,5 @@
+ANDROID_HOME = ''
+
+DEVICE_CONF = {
+    'device_id': '45O7E6TOSCF659LB'
+}
