@@ -69,6 +69,10 @@ appium遵从C/S模型：
             - device对象，包含了设备的相关信息
         - adb.py 
             - adb操作类
+    - htmltestrunner_py3.py
+        - htmltestrunner的python3版本，制造测试报告
+    - appium_case.py
+        - 测试用例单元
 - result
     - 测试结果会被保存在这里
     - 测试结果文件夹命名为时间+机型id

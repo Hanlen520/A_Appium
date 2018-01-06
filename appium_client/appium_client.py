@@ -5,6 +5,7 @@ from .device.device import Device
 class AppiumClient(object):
     def __init__(self, _device_conf):
         self.device = Device(_device_conf)
+        self.server = None
         self.driver = None
 
     def run(self):

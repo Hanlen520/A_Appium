@@ -1,9 +1,14 @@
+# ANDROID HOME 位置
 ANDROID_HOME = ''
 JAVA_HOME = ''
 
+# ROOT DIRS
 RESULT_PATH = 'result'
 CASE_PATH = 'cases'
 API_PATH = 'api'
+
+# CASES PATH
+
 
 
 DEVICE_CONF = {

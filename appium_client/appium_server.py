@@ -7,7 +7,12 @@ SERVER_COMMAND = ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-
 
 class AppiumServer(object):
     def __init__(self, _device):
-        self.desired_caps = self._get_desire_caps(_device)
+        # 设备对象
+        self.device = _device
+        #
+        self.desired_caps = None
+        # 服务端子进程对象
+        self._server_process = None
 
     @staticmethod
     def _get_desire_caps(_device):
@@ -27,6 +32,8 @@ class AppiumServer(object):
         return _desired_caps
 
     def start(self):
+        self.desired_caps = self._get_desire_caps(self.device)
+
         _cmd = SERVER_COMMAND.format(
             # todo: auto calculate these ports num
             port = 26270,
