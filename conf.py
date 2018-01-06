@@ -7,10 +7,6 @@ RESULT_PATH = 'result'
 CASE_PATH = 'cases'
 API_PATH = 'api'
 
-# CASES PATH
-
-
-
-DEVICE_CONF = {
-    'device_id': '45O7E6TOSCF659LB'
-}
+DEVICE_LIST = (
+    '45O7E6TOSCF659LB',
+)

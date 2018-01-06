@@ -6,23 +6,19 @@ SERVER_COMMAND = ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-
 
 
 class AppiumServer(object):
-    def __init__(self, _device):
-        # 设备对象
-        self.device = _device
+    def __init__(self, case_object):
         #
-        self.desired_caps = None
+        self.desired_caps = self._get_desire_caps(case_object)
         # 服务端子进程对象
         self._server_process = None
 
-    @staticmethod
-    def _get_desire_caps(_device):
-        # TODO: 在device里添加各项参数
+    def _get_desire_caps(self, _case_object):
         _desired_caps = dict()
-        _desired_caps['deviceName'] = '{}-TP908A'.format(_device.device_id)
+        _desired_caps['deviceName'] = '{}-TP908A'.format(_case_object.device_id)
         _desired_caps['platformName'] = 'Android'
         _desired_caps['platformVersion'] = 25
-        _desired_caps['appPackage'] = 'com.cyanogenmod.trebuchet'
-        _desired_caps['appActivity'] = 'com.android.launcher3.Launcher'
+        _desired_caps['appPackage'] = _case_object.module_name.app_package
+        _desired_caps['appActivity'] = _case_object.module_name.app_activity
         _desired_caps['dontStopAppOnReset'] = True
         _desired_caps['noReset'] = True
         _desired_caps['stopAppAtEnd'] = False
@@ -32,8 +28,6 @@ class AppiumServer(object):
         return _desired_caps
 
     def start(self):
-        self.desired_caps = self._get_desire_caps(self.device)
-
         _cmd = SERVER_COMMAND.format(
             # todo: auto calculate these ports num
             port = 26270,
