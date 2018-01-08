@@ -13,6 +13,8 @@ class AppiumServer(object):
         self.desired_caps = self._get_desire_caps(case_object)
         # 服务端子进程对象
         self._server_process = None
+        #
+        self._driver = None
 
     def _get_desire_caps(self, _case_object):
         _desired_caps = dict()
@@ -48,8 +50,10 @@ class AppiumServer(object):
     @log_printer('STOP server ...')
     def stop(self):
         self._server_process.terminate()
+        self._driver.quit()
 
     def _get_driver(self, port_num):
-        return webdriver.Remote(
+        self._driver = webdriver.Remote(
             'http://localhost:{}/wd/hub'.format(port_num),
             self.desired_caps)
+        return self._driver

@@ -638,6 +638,8 @@ class HTMLTestRunner(Template_mixin):
         result = _TestResult(self.verbosity)
         test(result)
         self.stopTime = datetime.datetime.now()
+        print (type(test))
+        print (type(result))
         self.generateReport(test, result)
         print('Time Elapsed: {}'.format((self.stopTime-self.startTime)), file=sys.stderr)
         return result

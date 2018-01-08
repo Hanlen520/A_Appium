@@ -4,6 +4,7 @@ from .htmltestrunner_py3 import HTMLTestRunner
 from .device.device import Device
 from collections import namedtuple
 from conf import CASE_PATH, RESULT_PATH
+from appium_client.appium_suite import AppiumSuite
 import unittest
 import traceback
 import sys
@@ -31,10 +32,11 @@ class AppiumClient(object):
             # begin
             for each_case in self.test_suite:
                 self.server = _server_object = AppiumServer(each_case)
-                self.driver = _driver = _server_object.start()
-                _test_case = unittest.defaultTestLoader.loadTestsFromModule(each_case.module_object)
+                self.driver = _server_object.start()
+                _test_case = self._load_case(each_case.module_object)
+                _test_case = AppiumSuite(_test_case)
                 # TODO: runner里面配置log位置和conf等, 需要一系列调整
-                self.runner.run(_test_case, _driver)
+                self.runner.run(_test_case)
         except Exception:
             print(traceback.print_exc())
         finally:
@@ -59,14 +61,8 @@ class AppiumClient(object):
                     _result.append(TestCaseObject(Device(_each_device), _case_class))
         return _result
 
-    @staticmethod
-    def _confirm_device_connected(_device_id):
-        # todo: use adb
-        pass
-
-    @staticmethod
-    def _build_device_object(_device_id):
-        pass
+    def _load_case(self, _module_object):
+        return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 
     @staticmethod
     def import_class(import_str):
