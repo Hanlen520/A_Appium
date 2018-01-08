@@ -3,7 +3,7 @@ from .console_utils import log_printer
 from .htmltestrunner_py3 import HTMLTestRunner
 from .device.device import Device
 from collections import namedtuple
-from conf import CASE_PATH
+from conf import CASE_PATH, RESULT_PATH
 import unittest
 import sys
 import os
@@ -14,33 +14,34 @@ sys.path.insert(0, os.path.abspath(CASE_PATH))
 
 class AppiumClient(object):
     def __init__(self, _device_list):
-        # 配置设备字典
-        self._device_list = _device_list
         # 服务端对象
         self.server = None
         # 驱动
         self.driver = None
         # 执行测试的引擎
-        self.runner = HTMLTestRunner
+        self.runner = self._get_runner(RESULT_PATH)
         # 测试集
         self.test_suite = None
 
     def run(self, _test_case_dict):
-        # 获取合法的待测试用例集
-        self.test_suite = self._build_test_suite(_test_case_dict)
-        # begin
-        for each_case in self.test_suite:
-            _driver = AppiumServer(each_case).start()
-            _test_case = unittest.defaultTestLoader.loadTestsFromModule(each_case.module_object)
-            # TODO: runner里面配置log位置和conf等, 需要一系列调整
-            HTMLTestRunner.run(_test_case, _driver)
-
-        # stop
-        self.stop()
+        try:
+            # 获取合法的待测试用例集
+            self.test_suite = self._build_test_suite(_test_case_dict)
+            # begin
+            for each_case in self.test_suite:
+                self.server = _server_object = AppiumServer(each_case)
+                self.driver = _driver = _server_object.start()
+                _test_case = unittest.defaultTestLoader.loadTestsFromModule(each_case.module_object)
+                # TODO: runner里面配置log位置和conf等, 需要一系列调整
+                HTMLTestRunner.run(_test_case, _driver)
+        except Exception as e:
+            print (Exception(e))
+        finally:
+            # stop
+            self.stop()
 
     def stop(self):
         self.server.stop()
-        self.driver.quit()
 
     @staticmethod
     @log_printer('BUILD test suite ... ')
@@ -74,3 +75,20 @@ class AppiumClient(object):
             return getattr(sys.modules[mod_str], class_str)
         except AttributeError:
             raise ImportError('Class {} cannot be found'.format(class_str))
+
+    @staticmethod
+    def _get_runner(log_dir):
+        """
+        获取HTMLTestRunner实例.
+        HTMLTestRunner对unittest进行了封装, 能够在测试执行后生成html格式的报告.
+        执行用例的部分依旧沿用unittest.
+        """
+        import time
+        report_file = os.path.join(log_dir, "{}.html".format(str(time.time()).split('.')[0]))
+        fp = open(report_file, 'wb')
+        # report file path, title
+        runner = HTMLTestRunner(
+            stream=fp,
+            title='abc'
+        )
+        return runner
