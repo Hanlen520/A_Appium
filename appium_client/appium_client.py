@@ -5,6 +5,7 @@ from .device.device import Device
 from collections import namedtuple
 from conf import CASE_PATH, RESULT_PATH
 import unittest
+import traceback
 import sys
 import os
 
@@ -33,15 +34,16 @@ class AppiumClient(object):
                 self.driver = _driver = _server_object.start()
                 _test_case = unittest.defaultTestLoader.loadTestsFromModule(each_case.module_object)
                 # TODO: runner里面配置log位置和conf等, 需要一系列调整
-                HTMLTestRunner.run(_test_case, _driver)
-        except Exception as e:
-            print (Exception(e))
+                self.runner.run(_test_case, _driver)
+        except Exception:
+            print(traceback.print_exc())
         finally:
             # stop
             self.stop()
 
     def stop(self):
         self.server.stop()
+        # self.driver.quit()
 
     @staticmethod
     @log_printer('BUILD test suite ... ')

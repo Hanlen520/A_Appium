@@ -32,20 +32,20 @@ class AppiumServer(object):
 
         return _desired_caps
 
-    @log_printer('start server ...')
+    @log_printer('START server ...')
     def start(self):
         port_num = PORT_LIST.pop(),
         bootstrap_port_num = BOOTSTRAP_PORT_LIST.pop(),
 
         _cmd = SERVER_COMMAND.format(
-            port = port_num,
-            bootstrap_port = bootstrap_port_num,
+            port = port_num[0],
+            bootstrap_port = bootstrap_port_num[0],
             device_id = self.desired_caps['deviceName'].split('-')[0]
         )
         self._server_process = subprocess.Popen(_cmd, shell=True)
-        return self._get_driver(port_num)
+        return self._get_driver(port_num[0])
 
-    @log_printer('stop server ...')
+    @log_printer('STOP server ...')
     def stop(self):
         self._server_process.terminate()
 
