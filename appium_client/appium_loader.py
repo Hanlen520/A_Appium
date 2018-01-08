@@ -1,9 +1,11 @@
+""" 一个自定义的、继承自defaultTestLoader的loader，将打包出来的形式变更为AppiumSuite对象 """
 import unittest
 import warnings
 import traceback
 from .appium_suite import AppiumSuite
 
 case = unittest.case
+
 
 class _FailedTest(case.TestCase):
     _testMethodName = None
@@ -14,19 +16,23 @@ class _FailedTest(case.TestCase):
 
     def __getattr__(self, name):
         if name != self._testMethodName:
-            return super(_FailedTest, self).__getattr__(name)
+            # return super(_FailedTest, self).__getattr__(name)
+            return getattr(super(_FailedTest, self), name)
         def testFailure():
             raise self._exception
         return testFailure
+
 
 def _make_failed_test(methodname, exception, suiteClass, message):
     test = _FailedTest(methodname, exception)
     return suiteClass((test,)), message
 
+
 def _make_failed_load_tests(name, exception, suiteClass):
     message = 'Failed to call load_tests:\n%s' % (traceback.format_exc(),)
     return _make_failed_test(
         name, exception, suiteClass, message)
+
 
 class AppiumLoader(unittest.defaultTestLoader):
     suiteClass = AppiumSuite

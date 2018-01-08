@@ -5,7 +5,7 @@ from .device.device import Device
 from collections import namedtuple
 from conf import CASE_PATH, RESULT_PATH
 from appium_client.appium_suite import AppiumSuite
-import unittest
+from appium_client.appium_loader import AppiumLoader
 import traceback
 import sys
 import os
@@ -13,6 +13,7 @@ import os
 
 TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object'])
 sys.path.insert(0, os.path.abspath(CASE_PATH))
+
 
 class AppiumClient(object):
     def __init__(self, _device_list):
@@ -50,6 +51,7 @@ class AppiumClient(object):
     @staticmethod
     @log_printer('BUILD test suite ... ')
     def _build_test_suite(_test_case_dict):
+        """ 构建测试用例集并封装成合适形式 """
         _result = list()
         for _each_device, _test_case_list in _test_case_dict.items():
             for _each_case in _test_case_list:
@@ -62,7 +64,8 @@ class AppiumClient(object):
         return _result
 
     def _load_case(self, _module_object):
-        return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
+        """ 读取测试用例并将其转换为testsuite形式 """
+        return AppiumLoader().loadTestsFromModule(_module_object)
 
     @staticmethod
     def import_class(import_str):

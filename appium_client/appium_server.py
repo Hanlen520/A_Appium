@@ -36,6 +36,7 @@ class AppiumServer(object):
 
     @log_printer('START server ...')
     def start(self):
+        """ 启动服务端 """
         port_num = PORT_LIST.pop(),
         bootstrap_port_num = BOOTSTRAP_PORT_LIST.pop(),
 
@@ -49,10 +50,12 @@ class AppiumServer(object):
 
     @log_printer('STOP server ...')
     def stop(self):
+        """ 停止服务端 """
         self._server_process.terminate()
         self._driver.quit()
 
     def _get_driver(self, port_num):
+        """ 获取driver对象 """
         self._driver = webdriver.Remote(
             'http://localhost:{}/wd/hub'.format(port_num),
             self.desired_caps)
