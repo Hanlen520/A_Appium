@@ -1,7 +1,7 @@
-import unittest.test.test_case as test_case
+from unittest.case import TestCase
 
 
-class AppiumCase(test_case):
-    def __init__(self, _driver):
-        super(AppiumCase, self).__init__()
+class AppiumCase(TestCase):
+    def __init__(self, _driver, *args, **kwargs):
+        super(AppiumCase, self).__init__(*args, **kwargs)
         self.driver = _driver

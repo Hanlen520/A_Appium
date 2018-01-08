@@ -1,10 +1,16 @@
 from .appium_server import AppiumServer
-from .device.device import Device
+from .console_utils import log_printer
 from .htmltestrunner_py3 import HTMLTestRunner
+from .device.device import Device
 from collections import namedtuple
+from conf import CASE_PATH
+import unittest
+import sys
+import os
 
-TestCaseObject = namedtuple('TestCaseObject', ['device_id', 'module_name'])
 
+TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object'])
+sys.path.insert(0, os.path.abspath(CASE_PATH))
 
 class AppiumClient(object):
     def __init__(self, _device_list):
@@ -25,10 +31,11 @@ class AppiumClient(object):
         # begin
         for each_case in self.test_suite:
             _driver = AppiumServer(each_case).start()
-            # TODO：看一下HTMLTESTRUNNER这里面是怎么运作的
-            HTMLTestRunner.run(each_case, _driver)
+            _test_case = unittest.defaultTestLoader.loadTestsFromModule(each_case.module_object)
+            # TODO: runner里面配置log位置和conf等, 需要一系列调整
+            HTMLTestRunner.run(_test_case, _driver)
 
-        #
+        # stop
         self.stop()
 
     def stop(self):
@@ -36,16 +43,17 @@ class AppiumClient(object):
         self.driver.quit()
 
     @staticmethod
+    @log_printer('BUILD test suite ... ')
     def _build_test_suite(_test_case_dict):
         _result = list()
         for _each_device, _test_case_list in _test_case_dict.items():
             for _each_case in _test_case_list:
                 try:
-                    _case_class = __import__(_each_case)
+                    _case_class = AppiumClient.import_class(_each_case)
                 except ImportError:
                     raise ImportError('{} is not found.'.format(_each_case))
                 else:
-                    _result.append(TestCaseObject(_each_device, _case_class))
+                    _result.append(TestCaseObject(Device(_each_device), _case_class))
         return _result
 
     @staticmethod
@@ -56,3 +64,13 @@ class AppiumClient(object):
     @staticmethod
     def _build_device_object(_device_id):
         pass
+
+    @staticmethod
+    def import_class(import_str):
+        """ Returns a class from a string including module and class. """
+        mod_str, _sep, class_str = import_str.rpartition('.')
+        __import__(mod_str)
+        try:
+            return getattr(sys.modules[mod_str], class_str)
+        except AttributeError:
+            raise ImportError('Class {} cannot be found'.format(class_str))

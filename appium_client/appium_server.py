@@ -1,9 +1,11 @@
 import subprocess
 from .appium import webdriver
+from .console_utils import log_printer
 
 
 SERVER_COMMAND = ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-timezone  --command-timeout 1200 --log-timestamp  --session-override '
-
+PORT_LIST = list(range(25000, 26000))
+BOOTSTRAP_PORT_LIST = list(range(26001, 27000))
 
 class AppiumServer(object):
     def __init__(self, case_object):
@@ -14,11 +16,14 @@ class AppiumServer(object):
 
     def _get_desire_caps(self, _case_object):
         _desired_caps = dict()
-        _desired_caps['deviceName'] = '{}-TP908A'.format(_case_object.device_id)
+        _desired_caps['deviceName'] = '{}-{}'.format(
+            _case_object.device_object.device_id,
+            _case_object.device_object.device_name
+        )
         _desired_caps['platformName'] = 'Android'
-        _desired_caps['platformVersion'] = 25
-        _desired_caps['appPackage'] = _case_object.module_name.app_package
-        _desired_caps['appActivity'] = _case_object.module_name.app_activity
+        _desired_caps['platformVersion'] = _case_object.device_object.system_version
+        _desired_caps['appPackage'] = _case_object.module_object.app_package
+        _desired_caps['appActivity'] = _case_object.module_object.app_activity
         _desired_caps['dontStopAppOnReset'] = True
         _desired_caps['noReset'] = True
         _desired_caps['stopAppAtEnd'] = False
@@ -27,19 +32,24 @@ class AppiumServer(object):
 
         return _desired_caps
 
+    @log_printer('start server ...')
     def start(self):
+        port_num = PORT_LIST.pop(),
+        bootstrap_port_num = BOOTSTRAP_PORT_LIST.pop(),
+
         _cmd = SERVER_COMMAND.format(
-            # todo: auto calculate these ports num
-            port = 26270,
-            bootstrap_port = 27235,
+            port = port_num,
+            bootstrap_port = bootstrap_port_num,
             device_id = self.desired_caps['deviceName'].split('-')[0]
         )
         self._server_process = subprocess.Popen(_cmd, shell=True)
-        return self._get_driver()
+        return self._get_driver(port_num)
 
+    @log_printer('stop server ...')
     def stop(self):
         self._server_process.terminate()
 
-    def _get_driver(self):
-        # TODO: port num
-        return webdriver.Remote('http://localhost:26270/wd/hub', self.desired_caps)
+    def _get_driver(self, port_num):
+        return webdriver.Remote(
+            'http://localhost:{}/wd/hub'.format(port_num),
+            self.desired_caps)
