@@ -11,6 +11,7 @@ SERVER_COMMAND = ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-
 PORT_LIST = list(range(25000, 26000))
 BOOTSTRAP_PORT_LIST = list(range(26001, 27000))
 
+
 def _is_port_using(_port_num):
     if 'linux' in sys.platform:
         port = str(_port_num)
@@ -43,6 +44,7 @@ def _is_port_using(_port_num):
                     return pid
             return False
         return False
+
 
 class AppiumServer(object):
     def __init__(self, case_object):

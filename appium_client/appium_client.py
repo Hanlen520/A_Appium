@@ -13,6 +13,16 @@ TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object',
 sys.path.insert(0, os.path.abspath(CASE_PATH))
 
 
+def import_class(import_str):
+    """ Returns a class from a string including module and class. """
+    mod_str, _sep, class_str = import_str.rpartition('.')
+    __import__(mod_str)
+    try:
+        return getattr(sys.modules[mod_str], class_str)
+    except AttributeError:
+        raise ImportError('Class {} cannot be found'.format(class_str))
+
+
 class AppiumClient(object):
     def __init__(self, _device_list):
         # 服务端对象
@@ -30,13 +40,13 @@ class AppiumClient(object):
             # timer
             _start_time = time.time()
             logi('START test: {}'.format(each_case.class_name))
-
+            # TODO: 同一个应用中不需要重复开服务
             self.server = AppiumServer(each_case)
             self.driver = self.server.start()
-            each_case.module_object().run_test(
+            each_case.module_object(
                 _device_object=each_case.device_object,
                 _driver=self.driver
-            )
+            ).run_test()
             self.stop()
 
             logi('DONE in {}s'.format(round(time.time() - _start_time, 2)))
@@ -51,8 +61,9 @@ class AppiumClient(object):
         _result = list()
         for _each_device, _test_case_list in _test_case_dict.items():
             for _each_case in _test_case_list:
+                # TODO： 在此处一并完成API的载入
                 try:
-                    _case_class = AppiumClient.import_class(_each_case)
+                    _case_class = import_class(_each_case)
                 except ImportError:
                     raise ImportError('{} is not found.'.format(_each_case))
                 else:
@@ -64,12 +75,3 @@ class AppiumClient(object):
         import unittest
         return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 
-    @staticmethod
-    def import_class(import_str):
-        """ Returns a class from a string including module and class. """
-        mod_str, _sep, class_str = import_str.rpartition('.')
-        __import__(mod_str)
-        try:
-            return getattr(sys.modules[mod_str], class_str)
-        except AttributeError:
-            raise ImportError('Class {} cannot be found'.format(class_str))

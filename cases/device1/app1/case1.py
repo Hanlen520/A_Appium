@@ -7,6 +7,5 @@ class Case1(BaseAppTestCase):
         self.driver.swipe(100, 100, 200, 200, 500)
         assert(True)
 
-    def run_test(self, *args, **kwargs):
-        super(Case1, self).run_test(*args, **kwargs)
+    def run(self):
         self.test_case1()
