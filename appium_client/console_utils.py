@@ -5,6 +5,7 @@ logging.basicConfig(
     level=logging.DEBUG,
     format='%(asctime)s %(filename)s:%(levelname)s %(message)s'
 )
+logi = logging.info
 
 def log_printer(_message):
     def m_decorator(func):
@@ -19,3 +20,5 @@ def log_printer(_message):
 
 def _get_now():
     return datetime.datetime.now().strftime('%Y-%m-%d %H:%M:%S')
+
+

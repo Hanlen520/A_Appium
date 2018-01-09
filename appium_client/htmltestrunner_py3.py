@@ -527,13 +527,14 @@ class _TestResult(TestResult):
 
     def __init__(self, verbosity=1):
         TestResult.__init__(self)
-        self.outputBuffer = StringIO.StringIO()
         self.stdout0 = None
         self.stderr0 = None
         self.success_count = 0
         self.failure_count = 0
         self.error_count = 0
         self.verbosity = verbosity
+        # add by fengzhangchi
+        self.outputBuffer = StringIO.StringIO()
 
         # result is a list of result in 4 tuple
         # (
@@ -548,6 +549,7 @@ class _TestResult(TestResult):
     def startTest(self, test):
         TestResult.startTest(self, test)
         # just one buffer for both stdout and stderr
+        self.outputBuffer = StringIO.StringIO()
         stdout_redirector.fp = self.outputBuffer
         stderr_redirector.fp = self.outputBuffer
         self.stdout0 = sys.stdout
@@ -593,13 +595,14 @@ class _TestResult(TestResult):
         TestResult.addError(self, test, err)
         _, _exc_str = self.errors[-1]
         output = self.complete_output()
-        self.result.append((2, test, output, _exc_str))
-        if self.verbosity > 1:
-            sys.stderr.write('E  ')
-            sys.stderr.write(str(test))
-            sys.stderr.write('\n')
-        else:
-            sys.stderr.write('E')
+        # self.result.append((2, test, output, _exc_str))
+        # if self.verbosity > 1:
+        #     sys.stderr.write('E  ')
+        #     sys.stderr.write(str(test))
+        #     sys.stderr.write('\n')
+        # else:
+        #     sys.stderr.write('E')
+        self.result.append((2, test, output, _exc_str, None, None))
 
     def addFailure(self, test, err):
         self.failure_count += 1
@@ -638,8 +641,6 @@ class HTMLTestRunner(Template_mixin):
         result = _TestResult(self.verbosity)
         test(result)
         self.stopTime = datetime.datetime.now()
-        print (type(test))
-        print (type(result))
         self.generateReport(test, result)
         print('Time Elapsed: {}'.format((self.stopTime-self.startTime)), file=sys.stderr)
         return result
@@ -697,7 +698,8 @@ class HTMLTestRunner(Template_mixin):
             report = report,
             ending = ending,
         )
-        self.stream.write(output)
+        # changed by fengzhangchi
+        self.stream.write(bytes(output, encoding='utf-8'))
 
 
     def _generate_stylesheet(self):

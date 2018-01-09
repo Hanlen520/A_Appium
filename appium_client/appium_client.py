@@ -5,7 +5,6 @@ from .device.device import Device
 from collections import namedtuple
 from conf import CASE_PATH, RESULT_PATH
 from appium_client.appium_suite import AppiumSuite
-from appium_client.appium_loader import AppiumLoader
 import traceback
 import sys
 import os
@@ -27,26 +26,19 @@ class AppiumClient(object):
         self.test_suite = None
 
     def run(self, _test_case_dict):
-        try:
-            # 获取合法的待测试用例集
-            self.test_suite = self._build_test_suite(_test_case_dict)
-            # begin
-            for each_case in self.test_suite:
-                self.server = _server_object = AppiumServer(each_case)
-                self.driver = _server_object.start()
-                _test_case = self._load_case(each_case.module_object)
-                _test_case = AppiumSuite(_test_case)
-                # TODO: runner里面配置log位置和conf等, 需要一系列调整
-                self.runner.run(_test_case)
-        except Exception:
-            print(traceback.print_exc())
-        finally:
-            # stop
+        # 获取合法的待测试用例集
+        self.test_suite = self._build_test_suite(_test_case_dict)
+        # begin
+        for each_case in self.test_suite:
+            self.server = AppiumServer(each_case)
+            self.driver = self.server.start()
+            _test_case = self.load_case(each_case.module_object)
+            # TODO: runner里面配置log位置和conf等, 需要一系列调整
+            self.runner.run(_test_case)
             self.stop()
 
     def stop(self):
         self.server.stop()
-        # self.driver.quit()
 
     @staticmethod
     @log_printer('BUILD test suite ... ')
@@ -63,9 +55,11 @@ class AppiumClient(object):
                     _result.append(TestCaseObject(Device(_each_device), _case_class))
         return _result
 
-    def _load_case(self, _module_object):
+    def load_case(self, _module_object):
         """ 读取测试用例并将其转换为testsuite形式 """
-        return AppiumLoader().loadTestsFromModule(_module_object)
+        import unittest
+        # unittest.defaultTestLoader.suiteClass = AppiumSuite
+        return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 
     @staticmethod
     def import_class(import_str):
