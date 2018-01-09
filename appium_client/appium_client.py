@@ -9,7 +9,7 @@ import os
 import time
 
 
-TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object'])
+TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object', 'class_name'])
 sys.path.insert(0, os.path.abspath(CASE_PATH))
 
 
@@ -29,7 +29,7 @@ class AppiumClient(object):
         for each_case in self.test_suite:
             # timer
             _start_time = time.time()
-            logi('START test: {}'.format(each_case.module_object.__name__))
+            logi('START test: {}'.format(each_case.class_name))
 
             self.server = AppiumServer(each_case)
             self.driver = self.server.start()
@@ -56,7 +56,7 @@ class AppiumClient(object):
                 except ImportError:
                     raise ImportError('{} is not found.'.format(_each_case))
                 else:
-                    _result.append(TestCaseObject(Device(_each_device), _case_class))
+                    _result.append(TestCaseObject(Device(_each_device), _case_class, _each_case))
         return _result
 
     def load_case(self, _module_object):

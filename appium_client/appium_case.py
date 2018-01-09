@@ -1,6 +1,4 @@
-from .device.device import DEVICE_LIST
-from .console_utils import logi, log_printer
-import sys
+from .console_utils import logi
 
 
 class AppiumCase(object):
@@ -10,6 +8,7 @@ class AppiumCase(object):
     def __init__(self):
         self.device = None
         self.driver = None
+        self.logi = logi
 
     def init_app(self):
         self.device.adb.shell("am start -W %s/%s" % (self.app_package, self.app_activity))
