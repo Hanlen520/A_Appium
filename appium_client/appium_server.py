@@ -1,6 +1,6 @@
 import subprocess
 from .appium import webdriver
-from .console_utils import log_printer, logi
+from .console_utils import log_printer, logi, kill_process
 import random
 import sys
 import os
@@ -83,9 +83,9 @@ class AppiumServer(object):
                 bootstrap_port = bootstrap_port_num,
                 device_id = self.desired_caps['deviceName'].split('-')[0]
             )
-            self._server_process = subprocess.Popen(_cmd, shell=True)
-            time.sleep(5)
             if not _is_port_using(port_num):
+                self._server_process = subprocess.Popen(_cmd, shell=True)
+                time.sleep(3)
                 _driver = self._get_driver(port_num)
             else:
                 logi('Port conflict. Retrying ...')
@@ -95,12 +95,13 @@ class AppiumServer(object):
     @log_printer('STOP server ...')
     def stop(self):
         """ 停止服务端 """
+        self._server_process.kill()
         self._server_process.terminate()
+        kill_process(self._server_process.pid)
         self._driver.quit()
 
     def _get_driver(self, port_num):
         """ 获取driver对象 """
-        print(self.desired_caps)
         self._driver = webdriver.Remote(
             'http://localhost:{}/wd/hub'.format(port_num),
             self.desired_caps)

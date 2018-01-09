@@ -1,13 +1,14 @@
 import os
+from .adb import ADB
 from ..console_utils import logi
 
 
-DEVICE_LIST = list()
+DEVICE_LIST = dict()
 
 def add_device(_device_object):
-    _id_list = [each.device_id for each in DEVICE_LIST]
-    if not _device_object.device_id in _id_list:
-        DEVICE_LIST.append(_device_object)
+    _id = _device_object.device_id
+    if _id not in DEVICE_LIST:
+        DEVICE_LIST[_id] = _device_object
         logi('device {} connected. '.format(_device_object.device_id))
 
 class Device(object):
@@ -21,6 +22,8 @@ class Device(object):
         self.device_name = self._get_device_conf('ro.product.name')
         # 加入到设备队列中
         add_device(self)
+        # adb
+        self.adb = ADB(self.device_id)
 
     def _get_device_conf(self, _conf_type):
         with os.popen(

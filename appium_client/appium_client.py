@@ -1,13 +1,12 @@
 from .appium_server import AppiumServer
 from .console_utils import log_printer
-from .htmltestrunner_py3 import HTMLTestRunner
 from .device.device import Device
+from .console_utils import logi
 from collections import namedtuple
-from conf import CASE_PATH, RESULT_PATH
-from appium_client.appium_suite import AppiumSuite
-import traceback
+from conf import CASE_PATH
 import sys
 import os
+import time
 
 
 TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object'])
@@ -20,8 +19,6 @@ class AppiumClient(object):
         self.server = None
         # 驱动
         self.driver = None
-        # 执行测试的引擎
-        self.runner = self._get_runner(RESULT_PATH)
         # 测试集
         self.test_suite = None
 
@@ -30,12 +27,19 @@ class AppiumClient(object):
         self.test_suite = self._build_test_suite(_test_case_dict)
         # begin
         for each_case in self.test_suite:
+            # timer
+            _start_time = time.time()
+            logi('START test: {}'.format(each_case.module_object.__name__))
+
             self.server = AppiumServer(each_case)
             self.driver = self.server.start()
-            _test_case = self.load_case(each_case.module_object)
-            # TODO: runner里面配置log位置和conf等, 需要一系列调整
-            self.runner.run(_test_case)
+            each_case.module_object().run_test(
+                _device_object=each_case.device_object,
+                _driver=self.driver
+            )
             self.stop()
+
+            logi('DONE in {}s'.format(round(time.time() - _start_time, 2)))
 
     def stop(self):
         self.server.stop()
@@ -58,7 +62,6 @@ class AppiumClient(object):
     def load_case(self, _module_object):
         """ 读取测试用例并将其转换为testsuite形式 """
         import unittest
-        # unittest.defaultTestLoader.suiteClass = AppiumSuite
         return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 
     @staticmethod
@@ -70,20 +73,3 @@ class AppiumClient(object):
             return getattr(sys.modules[mod_str], class_str)
         except AttributeError:
             raise ImportError('Class {} cannot be found'.format(class_str))
-
-    @staticmethod
-    def _get_runner(log_dir):
-        """
-        获取HTMLTestRunner实例.
-        HTMLTestRunner对unittest进行了封装, 能够在测试执行后生成html格式的报告.
-        执行用例的部分依旧沿用unittest.
-        """
-        import time
-        report_file = os.path.join(log_dir, "{}.html".format(str(time.time()).split('.')[0]))
-        fp = open(report_file, 'wb')
-        # report file path, title
-        runner = HTMLTestRunner(
-            stream=fp,
-            title='abc'
-        )
-        return runner

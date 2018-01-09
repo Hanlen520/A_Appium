@@ -55,6 +55,7 @@ appium遵从C/S模型：
     - unittest为单位
     - HTMLTestRunner运行，并打印报告
     
+    
 ## 文件结构 ##
 
 - appium_client  
