@@ -76,6 +76,8 @@ appium遵从C/S模型：
             - device对象，包含了设备的相关信息
         - adb.py 
             - adb操作类
+    - report_generator包
+        - 生成html报告
     - appium_case.py
         - 测试用例单元
     - console_utils.py
