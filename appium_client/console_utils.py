@@ -37,9 +37,19 @@ def timer(func):
         return _result
     return call_it
 
+
 def kill_process(_pid):
     """ 根据进程id杀死进程 """
     _pid_cmd = 'kill -9 {}' if 'linux' in sys.platform else 'taskkill /pid {} /F'
     os.system(_pid_cmd.format(_pid))
 
+
+def import_class(import_str):
+    """ Returns a class from a string including module and class. """
+    mod_str, _sep, class_str = import_str.rpartition('.')
+    __import__(mod_str)
+    try:
+        return getattr(sys.modules[mod_str], class_str)
+    except AttributeError:
+        raise ImportError('Class {} cannot be found'.format(class_str))
 

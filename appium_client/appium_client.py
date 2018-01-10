@@ -1,7 +1,7 @@
 from .appium_server import AppiumServer
 from .console_utils import log_printer
 from .device.device import Device
-from .console_utils import logi
+from .console_utils import logi, import_class
 from collections import namedtuple
 from conf import CASE_DIR, RESULT_DIR, WAIT_TIME
 import sys
@@ -11,16 +11,6 @@ import time
 
 TestCaseObject = namedtuple('TestCaseObject', ['device_type', 'module_object', 'case_name', 'app_name'])
 sys.path.insert(0, os.path.abspath(CASE_DIR))
-
-
-def import_class(import_str):
-    """ Returns a class from a string including module and class. """
-    mod_str, _sep, class_str = import_str.rpartition('.')
-    __import__(mod_str)
-    try:
-        return getattr(sys.modules[mod_str], class_str)
-    except AttributeError:
-        raise ImportError('Class {} cannot be found'.format(class_str))
 
 
 def get_log_dir():
@@ -75,7 +65,7 @@ class AppiumClient(object):
 
         for each_case in self.test_suite:
             _device_type = each_case.device_type
-            if not _device_type in self.device_list:
+            if _device_type not in self.device_list:
                 raise(NameError('device type name error: {}'.format(_device_type)))
             if not self.device_list[_device_type]:
                 raise(ValueError('{} don\'t have enough device'.format(_device_type)))
@@ -85,8 +75,9 @@ class AppiumClient(object):
             each_case.module_object(
                 _device_object=_device_object,
                 _case_name=each_case.case_name,
-                _log_dir=_log_dir
-            ).run_test()
+                _log_dir=_log_dir,
+                _app_name=each_case.app_name
+            ).__run_test()
 
             time.sleep(WAIT_TIME)
 
@@ -115,7 +106,7 @@ class AppiumClient(object):
                                 _each_device,
                                 _case_class,
                                 _each_case,
-                                _each_device + _app_name
+                                _each_device + '.' + _app_name
                             )
                         )
         return _result
