@@ -3,7 +3,7 @@ from .console_utils import log_printer
 from .device.device import Device
 from .console_utils import logi
 from collections import namedtuple
-from conf import CASE_DIR, RESULT_DIR
+from conf import CASE_DIR, RESULT_DIR, WAIT_TIME
 import sys
 import os
 import time
@@ -39,11 +39,12 @@ def init_device(_device_list):
     if not isinstance(_device_list, dict):
         raise(TypeError('device list must be a dictionary.'))
     for _device_type, _device_id in _device_list.items():
-        _device_obj = Device(_device_id[0])
-        if _device_type in _result:
-            _result[_device_type].append(_device_obj)
-        else:
-            _result[_device_type] = [_device_obj,]
+        for _each_device in _device_id:
+            _device_obj = Device(_each_device)
+            if _device_type in _result:
+                _result[_device_type].append(_device_obj)
+            else:
+                _result[_device_type] = [_device_obj,]
     print_device_list(_result)
     return _result
 
@@ -86,6 +87,8 @@ class AppiumClient(object):
                 _case_name=each_case.case_name,
                 _log_dir=_log_dir
             ).run_test()
+
+            time.sleep(WAIT_TIME)
 
         # after all
         self.stop()

@@ -1,4 +1,5 @@
 from .console_utils import logi, log_printer, timer
+from conf import API_DIR
 import traceback
 import os
 
@@ -21,6 +22,11 @@ class AppiumCase(object):
         self.case_log_dir = os.path.join(_log_dir, self.case_name)
         # 初始化应用
         self.init_app()
+
+    def init_api(self):
+        # TODO: 考虑api的加载策略
+        pass
+
 
     def init_app(self):
         """ 到达目标应用的目标页面 """
@@ -49,7 +55,6 @@ class AppiumCase(object):
     def clean_up(self):
         pass
 
-    @log_printer('start test ...')
     def run(self):
         """ 在用例中重写这个函数以安排测试入口 """
         pass
