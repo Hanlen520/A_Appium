@@ -1,35 +1,63 @@
-from unittest.case import TestCase
-from .device.device import DEVICE_LIST
-from .console_utils import logi
+from .console_utils import logi, log_printer, timer
+import traceback
 import os
 
 
-class AppiumCase(TestCase):
+class AppiumCase(object):
     app_package = None
     app_activity = None
 
-    def __init__(self, _driver, *args, **kwargs):
-        super(AppiumCase, self).__init__(*args, **kwargs)
-        self.driver = self.init_driver()
+    def __init__(self, _device_object, _driver, _case_name, _log_dir):
+        self.device = None
+        self.driver = None
+        self.logi = logi
+        # Device对象
+        self.device = _device_object
+        # driver对象
+        self.driver = _driver
+        # 用例名称
+        self.case_name = _case_name
+        # 结果文件夹
+        self.case_log_dir = os.path.join(_log_dir, self.case_name)
+        # 初始化应用
+        self.init_app()
 
-    # @classmethod
-    # def setUp(cls):
-    #     logi('set up case...')
-    #     cls.driver = cls.init_driver()
-    #     if cls.driver.current_activity != cls.app_activity:
-    #         command = "am start -W %s/%s" % (cls.app_package, cls.app_activity)
-    #         os.system(command)
+    def init_app(self):
+        """ 到达目标应用的目标页面 """
+        self.device.adb.shell("am start -W %s/%s" % (self.app_package, self.app_activity))
 
-    def setUp(self):
-        logi('set up case...')
-        if self.driver.current_activity != self.app_activity:
-            command = "am start -W %s/%s" % (self.app_package, self.app_activity)
-            os.system(command)
+    @timer
+    def run_test(self):
+        """ 执行用例的流程 """
+        logi('Start case: {}'.format(self.case_name))
+        try:
+            self.prepare()
+            self.run()
+        except:
+            self.__deal_with_exception()
+        else:
+            self.__finish()
+        finally:
+            self.clean_up()
 
-    @classmethod
-    def init_driver(cls):
-        if DEVICE_LIST:
-            return DEVICE_LIST[0]
+    @log_printer('preparing ...')
+    def prepare(self):
+        pass
 
+    @log_printer('cleaning up ...')
+    def clean_up(self):
+        pass
 
+    @log_printer('start test ...')
+    def run(self):
+        """ 在用例中重写这个函数以安排测试入口 """
+        pass
 
+    def __deal_with_exception(self):
+        # TODO: anr log/ all log/ console log
+        self.device.get_screen_shot(os.path.join(self.case_log_dir, 'screenshot.png'))
+        traceback.print_exc(file=open(os.path.join(self.case_log_dir, 'traceback.txt'), 'w+'))
+
+    def __finish(self):
+        # no error end
+        pass

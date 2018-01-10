@@ -1,17 +1,37 @@
 from .appium_server import AppiumServer
 from .console_utils import log_printer
-from .htmltestrunner_py3 import HTMLTestRunner
 from .device.device import Device
+from .console_utils import logi
 from collections import namedtuple
-from conf import CASE_PATH, RESULT_PATH
-from appium_client.appium_suite import AppiumSuite
-import traceback
+from conf import CASE_DIR, RESULT_DIR
 import sys
 import os
+import time
 
 
-TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object'])
-sys.path.insert(0, os.path.abspath(CASE_PATH))
+TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object', 'case_name'])
+sys.path.insert(0, os.path.abspath(CASE_DIR))
+
+
+def import_class(import_str):
+    """ Returns a class from a string including module and class. """
+    mod_str, _sep, class_str = import_str.rpartition('.')
+    __import__(mod_str)
+    try:
+        return getattr(sys.modules[mod_str], class_str)
+    except AttributeError:
+        raise ImportError('Class {} cannot be found'.format(class_str))
+
+
+def get_log_dir():
+    _dir_path = os.path.abspath(
+        os.path.join(
+            RESULT_DIR, 'RESULT'+str(time.time()).split('.')[0]
+        )
+    )
+    if not os.path.exists(_dir_path):
+        os.mkdir(_dir_path)
+    return _dir_path
 
 
 class AppiumClient(object):
@@ -20,8 +40,6 @@ class AppiumClient(object):
         self.server = None
         # 驱动
         self.driver = None
-        # 执行测试的引擎
-        self.runner = self._get_runner(RESULT_PATH)
         # 测试集
         self.test_suite = None
 
@@ -29,12 +47,18 @@ class AppiumClient(object):
         # 获取合法的待测试用例集
         self.test_suite = self._build_test_suite(_test_case_dict)
         # begin
+        _log_dir = get_log_dir()
+
         for each_case in self.test_suite:
+            # TODO: 同一个应用中不需要重复开服务
             self.server = AppiumServer(each_case)
             self.driver = self.server.start()
-            _test_case = self.load_case(each_case.module_object)
-            # TODO: runner里面配置log位置和conf等, 需要一系列调整
-            self.runner.run(_test_case)
+            each_case.module_object(
+                _device_object=each_case.device_object,
+                _driver=self.driver,
+                _case_name=each_case.case_name,
+                _log_dir=_log_dir
+            ).run_test()
             self.stop()
 
     def stop(self):
@@ -47,43 +71,13 @@ class AppiumClient(object):
         _result = list()
         for _each_device, _test_case_list in _test_case_dict.items():
             for _each_case in _test_case_list:
+                # TODO： 在此处一并完成API的载入
                 try:
-                    _case_class = AppiumClient.import_class(_each_case)
+                    _case_class = import_class(_each_case)
                 except ImportError:
                     raise ImportError('{} is not found.'.format(_each_case))
                 else:
-                    _result.append(TestCaseObject(Device(_each_device), _case_class))
+                    _result.append(TestCaseObject(Device(_each_device), _case_class, _each_case))
         return _result
 
-    def load_case(self, _module_object):
-        """ 读取测试用例并将其转换为testsuite形式 """
-        import unittest
-        # unittest.defaultTestLoader.suiteClass = AppiumSuite
-        return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 
-    @staticmethod
-    def import_class(import_str):
-        """ Returns a class from a string including module and class. """
-        mod_str, _sep, class_str = import_str.rpartition('.')
-        __import__(mod_str)
-        try:
-            return getattr(sys.modules[mod_str], class_str)
-        except AttributeError:
-            raise ImportError('Class {} cannot be found'.format(class_str))
-
-    @staticmethod
-    def _get_runner(log_dir):
-        """
-        获取HTMLTestRunner实例.
-        HTMLTestRunner对unittest进行了封装, 能够在测试执行后生成html格式的报告.
-        执行用例的部分依旧沿用unittest.
-        """
-        import time
-        report_file = os.path.join(log_dir, "{}.html".format(str(time.time()).split('.')[0]))
-        fp = open(report_file, 'wb')
-        # report file path, title
-        runner = HTMLTestRunner(
-            stream=fp,
-            title='abc'
-        )
-        return runner

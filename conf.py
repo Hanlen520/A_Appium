@@ -3,9 +3,9 @@ ANDROID_HOME = ''
 JAVA_HOME = ''
 
 # ROOT DIRS
-RESULT_PATH = 'result'
-CASE_PATH = 'cases'
-API_PATH = 'api'
+RESULT_DIR = 'result'
+CASE_DIR = 'cases'
+API_DIR = 'api'
 
 DEVICE_LIST = (
     '45O7E6TOSCF659LB',
