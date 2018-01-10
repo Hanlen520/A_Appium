@@ -53,9 +53,7 @@ class ADB(object):
         self.shell('settings put global stay_on_while_plugged_in 3')
 
     def screen_shot(self, appPath):
-        """
-        获取当前设备的截图,导出到指定目录
-        """
+        """ 获取当前设备的截图,导出到指定目录 """
         self.shell("/system/bin/screencap -p /sdcard/temp.png")
         time.sleep(2)
         self.adb("pull /sdcard/temp.png %s" % appPath)
