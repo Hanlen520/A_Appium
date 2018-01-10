@@ -1,7 +1,11 @@
 from .console_utils import logi, log_printer, timer, import_class
+from .report_generator.report_generator import markdown2html
 from conf import API_DIR
+from collections import namedtuple
 import traceback
 import os
+
+ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot'])
 
 
 def module_to_class_name(_name):
@@ -33,7 +37,12 @@ class AppiumCase(object):
         # 导入API
         self.api = self.__init_api(_app_name)
 
-    def __init_api(self, _app_name):
+        #
+        self.__screenshot = None
+        self.__traceback = None
+
+    @staticmethod
+    def __init_api(_app_name):
         # TODO: 考虑api的加载策略
         _api_path = '{}.{}.{}.{}'.format(
             API_DIR, _app_name,
@@ -60,6 +69,15 @@ class AppiumCase(object):
         else:
             self.__finish()
         finally:
+            markdown2html(
+                ReportObject(
+                    self.case_name,
+                    self.__status,
+                    self.__traceback,
+                    self.__screenshot
+                ),
+                os.path.join(self.case_log_dir, 'result.html')
+            )
             self.clean_up()
             self.driver.reset()
 
@@ -77,10 +95,14 @@ class AppiumCase(object):
 
     def __deal_with_exception(self):
         # TODO: anr log/ all log/ console log
-        self.device.get_screen_shot(os.path.join(self.case_log_dir, 'screenshot.png'))
+        self.__status = False
+
+        self.__screenshot = os.path.join(self.case_log_dir, 'screenshot.png')
+        self.__traceback = traceback.print_exc()
+
+        self.device.get_screen_shot(self.__screenshot)
         traceback.print_exc(file=open(os.path.join(self.case_log_dir, 'traceback.txt'), 'w+'))
 
     def __finish(self):
         # no error end
-        pass
-
+        self.__status = True
