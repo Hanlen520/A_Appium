@@ -47,10 +47,12 @@ def init_device(_device_list):
     print_device_list(_result)
     return _result
 
+
 def print_device_list(_device_list):
     logi('-'*20 + 'Devices Lists' + '-'*20)
     for _device_type, _type_list in _device_list.items():
         logi('{}: {}'.format(_device_type, _type_list[0]))
+
 
 def off_all_devices(_device_object_list):
     for each_type in _device_object_list.values():
