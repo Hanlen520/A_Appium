@@ -39,7 +39,7 @@ def timer(func):
 
 def kill_process(_pid):
     """ 根据进程id杀死进程 """
-    _pid_cmd = 'kill -9 {}' if 'linux' in sys.platform else 'taskkill /F /pid {}'
+    _pid_cmd = 'kill -9 {}' if 'linux' in sys.platform else 'taskkill /pid {} /F'
     os.system(_pid_cmd.format(_pid))
 
 

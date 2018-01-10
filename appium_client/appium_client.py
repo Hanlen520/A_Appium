@@ -63,6 +63,7 @@ class AppiumClient(object):
 
     def stop(self):
         self.server.stop()
+        self.server = None
 
     @staticmethod
     @log_printer('BUILD test suite ... ')
@@ -77,7 +78,13 @@ class AppiumClient(object):
                 except ImportError:
                     raise ImportError('{} is not found.'.format(_each_case))
                 else:
-                    _result.append(TestCaseObject(Device(_each_device), _case_class, _each_case))
+                    _result.append(
+                        TestCaseObject(
+                            Device(_each_device),
+                            _case_class,
+                            _each_case
+                        )
+                    )
         return _result
 
 

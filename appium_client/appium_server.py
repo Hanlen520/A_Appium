@@ -1,15 +1,30 @@
 import subprocess
 from .appium import webdriver
 from .console_utils import log_printer, logi, kill_process
+from conf import ANDROID_HOME, JAVA_HOME, APPIUM_HOME
 import random
 import sys
 import os
 import time
 
 
-SERVER_COMMAND = ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-timezone  --command-timeout 1200 --log-timestamp  --session-override '
 PORT_LIST = list(range(25000, 26000))
 BOOTSTRAP_PORT_LIST = list(range(26001, 27000))
+
+
+START_TIME_LIMIT = 200
+if 'linux' in sys.platform:
+    ENV_STR = '''
+    export ANDROID_HOME=%s
+    export JAVA_HOME=%s
+    export NODE_HOME=%s
+    export PATH=$JAVA_HOME/bin:$ANROID_HOME:$NODE_HOME:$PATH
+
+    ''' % (ANDROID_HOME, JAVA_HOME, APPIUM_HOME)
+else:
+    ENV_STR = ''
+
+SERVER_COMMAND = ENV_STR + ' appium -p {port} -bp {bootstrap_port} -U {device_id} --local-timezone  --command-timeout 1200 --log-timestamp  --session-override '
 
 
 def _is_port_using(_port_num):
@@ -87,7 +102,7 @@ class AppiumServer(object):
             )
             if not _is_port_using(port_num):
                 self._server_process = subprocess.Popen(_cmd, shell=True)
-                time.sleep(3)
+                time.sleep(8)
                 _driver = self._get_driver(port_num)
             else:
                 logi('Port conflict. Retrying ...')
@@ -98,10 +113,11 @@ class AppiumServer(object):
     def stop(self):
         """ 停止服务端 """
         # todo：杀不干净！
-        if hasattr(self._server_process, 'appium_pid'):
-            kill_process(self._server_process.appium_pid)
-        self._server_process.terminate()
         self._driver.quit()
+        if hasattr(self._server_process, 'pid'):
+            kill_process(self._server_process.pid)
+        self._server_process.terminate()
+        self._server_process = None
 
     def _get_driver(self, port_num):
         """ 获取driver对象 """
