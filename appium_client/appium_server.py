@@ -97,9 +97,10 @@ class AppiumServer(object):
     @log_printer('STOP server ...')
     def stop(self):
         """ 停止服务端 """
-        self._server_process.kill()
+        # todo：杀不干净！
+        if hasattr(self._server_process, 'appium_pid'):
+            kill_process(self._server_process.appium_pid)
         self._server_process.terminate()
-        kill_process(self._server_process.pid)
         self._driver.quit()
 
     def _get_driver(self, port_num):

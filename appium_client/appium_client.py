@@ -3,14 +3,14 @@ from .console_utils import log_printer
 from .device.device import Device
 from .console_utils import logi
 from collections import namedtuple
-from conf import CASE_PATH
+from conf import CASE_DIR, RESULT_DIR
 import sys
 import os
 import time
 
 
-TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object', 'class_name'])
-sys.path.insert(0, os.path.abspath(CASE_PATH))
+TestCaseObject = namedtuple('TestCaseObject', ['device_object', 'module_object', 'case_name'])
+sys.path.insert(0, os.path.abspath(CASE_DIR))
 
 
 def import_class(import_str):
@@ -21,6 +21,17 @@ def import_class(import_str):
         return getattr(sys.modules[mod_str], class_str)
     except AttributeError:
         raise ImportError('Class {} cannot be found'.format(class_str))
+
+
+def get_log_dir():
+    _dir_path = os.path.abspath(
+        os.path.join(
+            RESULT_DIR, 'RESULT'+str(time.time()).split('.')[0]
+        )
+    )
+    if not os.path.exists(_dir_path):
+        os.mkdir(_dir_path)
+    return _dir_path
 
 
 class AppiumClient(object):
@@ -36,20 +47,19 @@ class AppiumClient(object):
         # 获取合法的待测试用例集
         self.test_suite = self._build_test_suite(_test_case_dict)
         # begin
+        _log_dir = get_log_dir()
+
         for each_case in self.test_suite:
-            # timer
-            _start_time = time.time()
-            logi('START test: {}'.format(each_case.class_name))
             # TODO: 同一个应用中不需要重复开服务
             self.server = AppiumServer(each_case)
             self.driver = self.server.start()
             each_case.module_object(
                 _device_object=each_case.device_object,
-                _driver=self.driver
+                _driver=self.driver,
+                _case_name=each_case.case_name,
+                _log_dir=_log_dir
             ).run_test()
             self.stop()
-
-            logi('DONE in {}s'.format(round(time.time() - _start_time, 2)))
 
     def stop(self):
         self.server.stop()
@@ -70,8 +80,4 @@ class AppiumClient(object):
                     _result.append(TestCaseObject(Device(_each_device), _case_class, _each_case))
         return _result
 
-    def load_case(self, _module_object):
-        """ 读取测试用例并将其转换为testsuite形式 """
-        import unittest
-        return unittest.defaultTestLoader.loadTestsFromModule(_module_object)
 

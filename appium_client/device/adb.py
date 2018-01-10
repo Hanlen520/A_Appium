@@ -1,4 +1,4 @@
-import subprocess
+import time
 import os
 import sys
 
@@ -47,5 +47,15 @@ class ADB(object):
 
     def shell(self, args):
         cmd = "%s %s shell %s" % (command, self.device_id, str(args),)
-        print(cmd)
         return os.system(cmd)
+
+    def stay_wake(self):
+        self.shell('settings put global stay_on_while_plugged_in 3')
+
+    def screen_shot(self, appPath):
+        """
+        获取当前设备的截图,导出到指定目录
+        """
+        self.shell("/system/bin/screencap -p /sdcard/temp.png")
+        time.sleep(2)
+        self.adb("pull /sdcard/temp.png %s" % appPath)

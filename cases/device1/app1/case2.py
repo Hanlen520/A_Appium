@@ -1,5 +1,4 @@
 from ..base_app_test_case import BaseAppTestCase
-from appium_client.console_utils import logi
 
 
 class Case2(BaseAppTestCase):
