@@ -62,28 +62,27 @@ def _is_port_using(_port_num):
 
 
 class AppiumServer(object):
-    def __init__(self, case_object):
+    def __init__(self, _arg_dict):
         #
-        self.desired_caps = self._get_desire_caps(case_object)
+        self.desired_caps = self._get_desire_caps(_arg_dict)
         # 服务端子进程对象
         self._server_process = None
         #
         self._driver = None
 
-    def _get_desire_caps(self, _case_object):
+    def _get_desire_caps(self, _arg_dict):
         _desired_caps = dict()
         _desired_caps['deviceName'] = '{}-{}'.format(
-            _case_object.device_object.device_id,
-            _case_object.device_object.device_name
+            _arg_dict['device_id'], _arg_dict['device_name']
         )
         _desired_caps['platformName'] = 'Android'
-        _desired_caps['platformVersion'] = _case_object.device_object.system_version
-        _desired_caps['appPackage'] = _case_object.module_object.app_package
-        _desired_caps['appActivity'] = _case_object.module_object.app_activity
+        _desired_caps['platformVersion'] = _arg_dict['system_version']
+        _desired_caps['appPackage'] = _arg_dict['app_package']
+        _desired_caps['appActivity'] = _arg_dict['app_activity']
         _desired_caps['dontStopAppOnReset'] = True
         _desired_caps['noReset'] = True
         _desired_caps['stopAppAtEnd'] = False
-        _desired_caps['autoUnlock'] = False
+        _desired_caps['autoUnlock'] = True
         _desired_caps['newCommandTimeout'] = 600
 
         return _desired_caps

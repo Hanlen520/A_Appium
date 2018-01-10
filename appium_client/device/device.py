@@ -1,15 +1,11 @@
 import os
 from .adb import ADB
 from ..console_utils import logi
+from appium_client.appium_server import AppiumServer
 
 
 DEVICE_LIST = dict()
 
-def add_device(_device_object):
-    _id = _device_object.device_id
-    if _id not in DEVICE_LIST:
-        DEVICE_LIST[_id] = _device_object
-        logi('device {} connected. '.format(_device_object.device_id))
 
 class Device(object):
     def __init__(self, _device_id):
@@ -20,11 +16,46 @@ class Device(object):
         # 获取设备版本号
         self.system_version = self._get_device_conf('ro.build.version.sdk')
         self.device_name = self._get_device_conf('ro.product.name')
-        # 加入到设备队列中
-        add_device(self)
         # adb
         self.adb = ADB(self.device_id)
         self.adb.stay_wake()
+        # 当前测试的app
+        self.cur_app = None
+        # 对应的server与driver
+        self.server = None
+        self.driver = None
+
+    def __str__(self):
+        return '{} - {}'.format(self.device_name, self.device_id)
+
+    def __repr__(self):
+        return self.__str__()
+
+    def bind(self, _case_object):
+        if self.cur_app == _case_object.app_name:
+            return None
+        else:
+            self.stop()
+            self.cur_app = _case_object.app_name
+
+        _server_dict = {
+            'device_id': self.device_id,
+            'device_name': self.device_name,
+            'system_version': self.system_version,
+            'app_package': _case_object.module_object.app_package,
+            'app_activity': _case_object.module_object.app_activity
+        }
+
+        self.server = AppiumServer(_server_dict)
+        self.driver = self.server.start()
+
+    def stop(self):
+        try:
+            self.server.stop()
+        except:
+            pass
+        self.driver = None
+        self.server = None
 
     def _get_device_conf(self, _conf_type):
         with os.popen(

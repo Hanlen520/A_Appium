@@ -7,14 +7,14 @@ class AppiumCase(object):
     app_package = None
     app_activity = None
 
-    def __init__(self, _device_object, _driver, _case_name, _log_dir):
+    def __init__(self, _device_object, _case_name, _log_dir):
         self.device = None
         self.driver = None
         self.logi = logi
         # Device对象
         self.device = _device_object
         # driver对象
-        self.driver = _driver
+        self.driver = _device_object.driver
         # 用例名称
         self.case_name = _case_name
         # 结果文件夹
@@ -39,6 +39,7 @@ class AppiumCase(object):
             self.__finish()
         finally:
             self.clean_up()
+            self.driver.reset()
 
     @log_printer('preparing ...')
     def prepare(self):
@@ -61,3 +62,4 @@ class AppiumCase(object):
     def __finish(self):
         # no error end
         pass
+
