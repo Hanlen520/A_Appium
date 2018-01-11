@@ -19,7 +19,7 @@ def log_printer(_message):
         def call_it(*args, **kwargs):
             logi(_message)
             _result = func(*args, **kwargs)
-            logi('End {}'.format(_message))
+            # logi('End {}'.format(_message))
             return _result
         return call_it
     return m_decorator

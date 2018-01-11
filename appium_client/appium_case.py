@@ -35,7 +35,7 @@ class AppiumCase(object):
         # 初始化应用
         self._init_app()
         # 导入API
-        self.api = self._init_api(_app_name)
+        self.api = self._init_api(_app_name, self.driver)
         # 报告制造
         self._report_generator = _report_generator
 
@@ -44,14 +44,14 @@ class AppiumCase(object):
         self._traceback = None
 
     @staticmethod
-    def _init_api(_app_name):
+    def _init_api(_app_name, _driver):
         _device_name, _app_module_name, *_ = _app_name.split('.')
         _api_path = '{}.{}.{}.{}.{}'.format(
             API_DIR, _device_name, _app_module_name, _app_module_name,
             module_to_class_name(_app_module_name)
         )
         try:
-            return import_class(_api_path)
+            return import_class(_api_path)(_driver)
         except ImportError:
             raise (ImportError('{} not existed.'.format(_api_path)))
 
