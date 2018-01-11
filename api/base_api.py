@@ -1,5 +1,3 @@
-from appium_client.appium.webdriver.webdriver import WebDriver
-
-
-class BaseAPI(WebDriver):
-    pass
+class BaseAPI(object):
+    def __init__(self, _driver):
+        self.driver = _driver

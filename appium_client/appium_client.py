@@ -8,12 +8,13 @@ import sys
 import os
 import time
 
-
+# 用例对象，包含：设备类型、用例模块对象、用例名称、应用名称
 TestCaseObject = namedtuple('TestCaseObject', ['device_type', 'module_object', 'case_name', 'app_name'])
 sys.path.insert(0, os.path.abspath(CASE_DIR))
 
 
 def get_log_dir():
+    """ 获取生成结果的目标文件夹位置 """
     _dir_path = os.path.abspath(
         os.path.join(
             RESULT_DIR, 'RESULT'+str(time.time()).split('.')[0]
@@ -25,6 +26,7 @@ def get_log_dir():
 
 
 def init_device(_device_list):
+    """ 初始化设备队列 """
     _result = dict()
     if not isinstance(_device_list, dict):
         raise(TypeError('device list must be a dictionary.'))
@@ -40,15 +42,19 @@ def init_device(_device_list):
 
 
 def print_device_list(_device_list):
+    """ 展示现有设备队列 """
     logi('Device List'.center(40, '-'))
     for _device_type, _type_list in _device_list.items():
         logi('{}: {}'.format(_device_type, _type_list[0]))
     logi('End'.center(40, '-'))
 
+
 def off_all_devices(_device_object_list):
+    """ 停止所有设备 """
     for each_type in _device_object_list.values():
         for each in each_type:
             each.stop()
+
 
 class AppiumClient(object):
     def __init__(self, _device_list):
@@ -62,29 +68,33 @@ class AppiumClient(object):
     def run(self, _test_case_dict):
         # 获取合法的待测试用例集
         self.test_suite = self._build_test_suite(_test_case_dict)
-        # begin
+        # 获取目标位置
         _log_dir = get_log_dir()
-
+        # 初始化报告生成器
         self.report_generator = ReportGenerator(os.path.join(_log_dir, 'result.md'))
-
+        # 开始测试
         for each_case in self.test_suite:
-
+            # 检查设备的合法性
             _device_type = each_case.device_type
             if _device_type not in self.device_list:
                 raise(NameError('device type name error: {}'.format(_device_type)))
             if not self.device_list[_device_type]:
                 raise(ValueError('{} don\'t have enough device'.format(_device_type)))
 
+            # 默认取第一台设备作为主测机
             _device_object = self.device_list[_device_type][0]
             _device_object.bind(each_case)
+
+            # 向appium_case对象传入参数，开始测试
             each_case.module_object(
                 _device_object=_device_object,
                 _case_name=each_case.case_name,
                 _log_dir=_log_dir,
                 _app_name=each_case.app_name,
                 _report_generator=self.report_generator
-            )._run_test()
+            ).run_test()
 
+            # 每轮测试过后的等待时间
             time.sleep(WAIT_TIME)
 
         # after all
@@ -92,6 +102,7 @@ class AppiumClient(object):
         self.stop()
 
     def stop(self):
+        # 停止时断开所有设备，关闭他们对应的server
         off_all_devices(self.device_list)
 
     @staticmethod

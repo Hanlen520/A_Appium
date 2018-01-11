@@ -32,6 +32,7 @@ class Device(object):
         return self.__str__()
 
     def bind(self, _case_object):
+        # 绑定设备与server
         if self.cur_app == _case_object.app_name:
             return None
         else:
@@ -50,6 +51,7 @@ class Device(object):
         self.driver = self.server.start()
 
     def stop(self):
+        """ 停止设备 """
         try:
             self.server.stop()
         except:
@@ -58,6 +60,7 @@ class Device(object):
         self.server = None
 
     def _get_device_conf(self, _conf_type):
+        """ 获取设备配置信息 """
         with os.popen(
             'adb -s {} shell cat /system/build.prop'.format(self.device_id)
         ) as device_info:
@@ -67,6 +70,7 @@ class Device(object):
                     return each_line.split('=')[1]
 
     def _is_connected(self):
+        """ 是否已经连接 """
         with os.popen('adb devices') as device_list:
             for each_line in device_list.readlines():
                 if self.device_id in each_line and 'device' in each_line:
@@ -75,6 +79,7 @@ class Device(object):
                 raise ConnectionError('device {} not connected.'.format(self.device_id))
 
     def get_screen_shot(self, _path):
+        """ 获取截图 """
         self.adb.screen_shot(_path)
 
 if __name__ == '__main__':
