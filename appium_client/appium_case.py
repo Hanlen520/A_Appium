@@ -1,18 +1,10 @@
-from .console_utils import logi, log_printer, timer, import_class
+from .console_utils import logi, log_printer, timer, import_class, module_to_class_name
 from conf import API_DIR
 from collections import namedtuple
 import traceback
 import os
 
 ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot'])
-
-
-def module_to_class_name(_name):
-    _name = _name.capitalize()
-    for i, _letter in enumerate(list(_name)):
-        if _letter == '_':
-            _name[i+1] = _name[i+1].upper()
-    return _name.replace('_', '')
 
 
 class AppiumCase(object):
@@ -39,12 +31,27 @@ class AppiumCase(object):
         # 报告制造
         self._report_generator = _report_generator
 
-        #
+        # 截图与traceback
         self._screenshot = None
         self._traceback = None
 
+    @log_printer('preparing ...')
+    def prepare(self):
+        """ 测试前的准备 """
+        pass
+
+    @log_printer('cleaning up ...')
+    def clean_up(self):
+        """ 测试结束后的清理 """
+        pass
+
+    def run(self):
+        """ 在用例中重写这个函数以安排测试入口 """
+        pass
+
     @staticmethod
     def _init_api(_app_name, _driver):
+        """ 初始化API """
         _device_name, _app_module_name, *_ = _app_name.split('.')
         _api_path = '{}.{}.{}.{}.{}'.format(
             API_DIR, _device_name, _app_module_name, _app_module_name,
@@ -61,7 +68,7 @@ class AppiumCase(object):
 
     @log_printer('TEST'.center(40, '-'))
     @timer
-    def _run_test(self):
+    def run_test(self):
         """ 执行用例的流程 """
         try:
             self.prepare()
@@ -82,18 +89,6 @@ class AppiumCase(object):
             )
             self.clean_up()
             self.driver.reset()
-
-    @log_printer('preparing ...')
-    def prepare(self):
-        pass
-
-    @log_printer('cleaning up ...')
-    def clean_up(self):
-        pass
-
-    def run(self):
-        """ 在用例中重写这个函数以安排测试入口 """
-        pass
 
     def _deal_with_exception(self):
         # TODO: anr log/ all log/ console log

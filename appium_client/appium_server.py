@@ -7,11 +7,11 @@ import sys
 import os
 import time
 
-
+# 端口范围
 PORT_LIST = list(range(25000, 26000))
 BOOTSTRAP_PORT_LIST = list(range(26001, 27000))
 
-
+# 环境配置
 START_TIME_LIMIT = 200
 if 'linux' in sys.platform:
     ENV_STR = '''
@@ -28,6 +28,7 @@ SERVER_COMMAND = ENV_STR + ' appium -p {port} -bp {bootstrap_port} -U {device_id
 
 
 def _is_port_using(_port_num):
+    """ 端口是否被使用 """
     if 'linux' in sys.platform:
         port = str(_port_num)
         cmd_outer = os.popen('netstat -tunlp |grep :%s' % port).read().strip()
@@ -67,10 +68,11 @@ class AppiumServer(object):
         self.desired_caps = self._get_desire_caps(_arg_dict)
         # 服务端子进程对象
         self._server_process = None
-        #
+        # 对应的driver
         self._driver = None
 
     def _get_desire_caps(self, _arg_dict):
+        """ 获取配置 """
         _desired_caps = dict()
         _desired_caps['deviceName'] = '{}-{}'.format(
             _arg_dict['device_id'], _arg_dict['device_name']

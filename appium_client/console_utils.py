@@ -53,3 +53,10 @@ def import_class(import_str):
     return getattr(_module, class_str)
 
 
+def module_to_class_name(_name):
+    """ 下划线命名转换为类命名 """
+    _name = _name.capitalize()
+    for i, _letter in enumerate(list(_name)):
+        if _letter == '_':
+            _name[i+1] = _name[i+1].upper()
+    return _name.replace('_', '')

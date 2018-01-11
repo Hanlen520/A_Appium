@@ -46,6 +46,7 @@ class ReportGenerator(object):
 
     @fix_report_object
     def add_section(self, _report_object):
+        """ 增加条目 """
         case_name = _report_object.case_name
         status = 'OK' if _report_object.status else 'ERROR'
         traceback_str = ('\n' + _report_object.traceback).replace('\n', '\n'+' '*8)
@@ -61,6 +62,7 @@ class ReportGenerator(object):
         self._content += html_content
 
     def build(self):
+        """ 构建报告 """
         with open(self._output_path, 'w+') as _result_file:
             _result_file.write(self._content)
 
