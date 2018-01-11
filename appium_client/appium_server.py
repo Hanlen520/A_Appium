@@ -87,7 +87,7 @@ class AppiumServer(object):
 
         return _desired_caps
 
-    @log_printer('START server ...')
+    @log_printer('start server')
     def start(self):
         """ 启动服务端 """
         while True:
@@ -108,7 +108,7 @@ class AppiumServer(object):
                 continue
             return _driver
 
-    @log_printer('STOP server ...')
+    @log_printer('stop server')
     def stop(self):
         """ 停止服务端 """
         # todo：杀不干净！
