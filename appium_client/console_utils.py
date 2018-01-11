@@ -4,6 +4,7 @@ import datetime
 import os
 import sys
 import time
+import importlib
 
 logging.basicConfig(
     level=logging.DEBUG,
@@ -18,6 +19,7 @@ def log_printer(_message):
         def call_it(*args, **kwargs):
             logi(_message)
             _result = func(*args, **kwargs)
+            logi('End {}'.format(_message))
             return _result
         return call_it
     return m_decorator
@@ -47,9 +49,7 @@ def kill_process(_pid):
 def import_class(import_str):
     """ Returns a class from a string including module and class. """
     mod_str, _sep, class_str = import_str.rpartition('.')
-    __import__(mod_str)
-    try:
-        return getattr(sys.modules[mod_str], class_str)
-    except AttributeError:
-        raise ImportError('Class {} cannot be found'.format(class_str))
+    _module = importlib.import_module(mod_str)
+    return getattr(_module, class_str)
+
 

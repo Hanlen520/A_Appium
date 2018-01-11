@@ -1,4 +1,4 @@
-from .appium_server import AppiumServer
+from .report_generator.report_generator import ReportGenerator
 from .console_utils import log_printer
 from .device.device import Device
 from .console_utils import logi, import_class
@@ -40,10 +40,10 @@ def init_device(_device_list):
 
 
 def print_device_list(_device_list):
-    logi('-'*20 + 'Devices Lists' + '-'*20)
+    logi('Device List'.center(40, '-'))
     for _device_type, _type_list in _device_list.items():
         logi('{}: {}'.format(_device_type, _type_list[0]))
-
+    logi('End'.center(40, '-'))
 
 def off_all_devices(_device_object_list):
     for each_type in _device_object_list.values():
@@ -56,6 +56,8 @@ class AppiumClient(object):
         self.test_suite = None
         # 初始化设备列表
         self.device_list = init_device(_device_list)
+        # 报告制作
+        self.report_generator = None
 
     def run(self, _test_case_dict):
         # 获取合法的待测试用例集
@@ -63,7 +65,10 @@ class AppiumClient(object):
         # begin
         _log_dir = get_log_dir()
 
+        self.report_generator = ReportGenerator(os.path.join(_log_dir, 'result.md'))
+
         for each_case in self.test_suite:
+
             _device_type = each_case.device_type
             if _device_type not in self.device_list:
                 raise(NameError('device type name error: {}'.format(_device_type)))
@@ -76,19 +81,21 @@ class AppiumClient(object):
                 _device_object=_device_object,
                 _case_name=each_case.case_name,
                 _log_dir=_log_dir,
-                _app_name=each_case.app_name
-            ).__run_test()
+                _app_name=each_case.app_name,
+                _report_generator=self.report_generator
+            )._run_test()
 
             time.sleep(WAIT_TIME)
 
         # after all
+        self.report_generator.build()
         self.stop()
 
     def stop(self):
         off_all_devices(self.device_list)
 
     @staticmethod
-    @log_printer('BUILD test suite ... ')
+    @log_printer('build test suite')
     def _build_test_suite(_test_case_dict):
         """ 构建测试用例集并封装成合适形式 """
         _result = list()

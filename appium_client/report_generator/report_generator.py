@@ -1,5 +1,3 @@
-import markdown
-
 
 SECTION_TEMPLATE = '''
 # {case_name}
@@ -24,12 +22,29 @@ STATUS_DICT = {
 }
 
 
+from functools import wraps
+from appium_client.appium_case import ReportObject
+def fix_report_object(func):
+    @wraps(func)
+    def call_it(_, _object):
+        _result = ReportObject(
+            case_name = _object.case_name if _object.case_name else 'Default case',
+            status = _object.status if _object.status else True,
+            traceback = _object.traceback if _object.traceback else '',
+            screenshot = _object.screenshot if _object.screenshot else ''
+        )
+        return func(_, _result)
+    return call_it
+
+
 class ReportGenerator(object):
-    def __init__(self):
+    def __init__(self, _output_path):
         # markdown 内容
+        self._output_path = _output_path
         self._content = str()
         self._head = CSS_TEMPLATE.replace('{COLOR}', STATUS_DICT['OK'])
 
+    @fix_report_object
     def add_section(self, _report_object):
         case_name = _report_object.case_name
         status = 'OK' if _report_object.status else 'ERROR'
@@ -46,8 +61,8 @@ class ReportGenerator(object):
         self._content += html_content
 
     def build(self):
-        return self._content
-        # return markdown.markdown(self._head + self._content)
+        with open(self._output_path, 'w+') as _result_file:
+            _result_file.write(self._content)
 
 
 if __name__ == '__main__':
