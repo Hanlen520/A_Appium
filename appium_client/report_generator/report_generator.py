@@ -1,14 +1,32 @@
-
 SECTION_TEMPLATE = '''
-# {case_name}
+{case_name}
 
-## {status}
 
-![]({screenshot})
+{status}
+
+
+
+::
 
 {traceback}
 
+
+.. image:: {case_name}/screenshot.png
+
 '''
+
+
+
+# SECTION_TEMPLATE = '''
+# # {case_name}
+#
+# ## {status}
+#
+# ![]({screenshot})
+#
+# {traceback}
+#
+# '''
 
 CSS_TEMPLATE = '''
 <style type="text/css">

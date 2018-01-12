@@ -11,4 +11,4 @@ A_Appium TestReport System
    :caption: Contents:
    :glob:
 
-   report_source/result*/*
+   report_source/RESULT*/*
