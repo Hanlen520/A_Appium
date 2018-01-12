@@ -71,7 +71,7 @@ class AppiumClient(object):
         # 获取目标位置
         _log_dir = get_log_dir()
         # 初始化报告生成器
-        self.report_generator = ReportGenerator(os.path.join(_log_dir, 'result.md'))
+        self.report_generator = ReportGenerator(os.path.join(_log_dir, 'result.rst'))
         # 开始测试
         for each_case in self.test_suite:
             # 检查设备的合法性
