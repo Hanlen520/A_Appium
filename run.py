@@ -1,5 +1,6 @@
 from appium_client.appium_client import AppiumClient
-from conf import DEVICE_LIST
+from conf import DEVICE_LIST, RESULT_DIR
+from test_report_system.generator import Generator
 import os
 import sys
 
@@ -17,5 +18,11 @@ TEST_SUITE = {
 
 
 if __name__ == '__main__':
-    # start
-    AppiumClient(DEVICE_LIST).run(TEST_SUITE)
+    # collect user input
+    # coming soon...
+
+    # start test
+    # AppiumClient(DEVICE_LIST).run(TEST_SUITE)
+
+    # build report
+    Generator(RESULT_DIR).build()
