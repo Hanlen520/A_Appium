@@ -6,6 +6,7 @@ from appium_client.console_utils import log_printer
 GENERATOR_DIR = os.path.join(os.getcwd(), 'html_builder')
 SOURCE_DIR = os.path.join(GENERATOR_DIR, 'source', 'report_source')
 
+
 @log_printer('load result files')
 def load_result(_ori_dir, _target_dir):
     _target_dir_list = os.listdir(_target_dir)
