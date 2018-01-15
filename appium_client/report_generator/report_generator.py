@@ -24,20 +24,10 @@ ScreenShot
 '''
 
 
-CSS_TEMPLATE = '''
-<style type="text/css">
-h1 {background-color: {COLOR}}
-</style>
-'''
-
-STATUS_DICT = {
-    'OK': 'green',
-    'ERROR': 'red'
-}
-
 
 from functools import wraps
 from appium_client.appium_case import ReportObject
+import os
 def fix_report_object(func):
     @wraps(func)
     def call_it(_, _object):
@@ -53,10 +43,11 @@ def fix_report_object(func):
 
 class ReportGenerator(object):
     def __init__(self, _output_path):
-        # markdown 内容
+        # 入口rst文件位置
         self._output_path = _output_path
-        self._content = str()
-        self._head = CSS_TEMPLATE.replace('{COLOR}', STATUS_DICT['OK'])
+        # 根目录位置
+        self._dir_path = os.path.dirname(self._output_path)
+        self._content = list()
 
     @fix_report_object
     def add_section(self, _report_object):
@@ -77,7 +68,11 @@ class ReportGenerator(object):
             traceback=traceback_str,
         )
 
-        self._content += html_content
+        _case_result_path = os.path.join(self._dir_path, case_name, 'result.rst')
+        with open(_case_result_path, 'w+') as f:
+            f.write(html_content)
+
+        self._content.append(html_content)
 
     def build(self):
         """ 构建报告 """
