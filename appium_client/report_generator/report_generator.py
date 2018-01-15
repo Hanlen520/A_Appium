@@ -1,3 +1,16 @@
+MODULE_TEMPLATE = '''
+CASES REPORT
+============
+
+.. toctree::
+   :maxdepth: 1
+   :caption: Contents:
+   :glob:
+
+   cases*/result
+'''
+
+
 SECTION_TEMPLATE = '''
 {case_name}
 
@@ -7,14 +20,15 @@ Test Result
 
 {status}
 
+'''
 
+ERROR_TEMPLATE = '''
 Traceback
 ---------
 
 ::
 
 {traceback}
-
 
 ScreenShot
 ----------
@@ -52,54 +66,34 @@ class ReportGenerator(object):
     @fix_report_object
     def add_section(self, _report_object):
         """ 增加条目 """
-        case_name = _report_object.case_name
-        case_name += '\n' + '='*len(case_name)
+        if _report_object.status:
+            _template = SECTION_TEMPLATE
+        else:
+            _template = SECTION_TEMPLATE + ERROR_TEMPLATE
+
+        ori_case_name = _report_object.case_name
+        case_name = ori_case_name + '\n' + '='*len(ori_case_name)
 
         status = 'OK' if _report_object.status else 'ERROR'
-        status += '\n' + '-'*len(status)
+        status = '**{}**'.format(status)
 
         traceback_str = ('\n' + _report_object.traceback).replace('\n', '\n'+' '*4)
         screen_path = _report_object.screenshot
 
-        html_content = SECTION_TEMPLATE.format(
+        html_content = _template.format(
             case_name=case_name,
             status=status,
             screenshot=screen_path,
             traceback=traceback_str,
         )
 
-        _case_result_path = os.path.join(self._dir_path, case_name, 'result.rst')
+        _case_result_path = os.path.join(self._dir_path, ori_case_name, 'result.rst')
         with open(_case_result_path, 'w+') as f:
             f.write(html_content)
 
-        self._content.append(html_content)
+        self._content.append(os.path.join(ori_case_name, 'result'))
 
     def build(self):
         """ 构建报告 """
         with open(self._output_path, 'w+') as _result_file:
-            _result_file.write(self._content)
-
-
-if __name__ == '__main__':
-    from collections import namedtuple
-    ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot'])
-    report_g = ReportGenerator()
-    report_g.add_section(
-        ReportObject(
-            'case111111', True,
-            'alkdsjhfalkjsdhfaljkfd', 'aa.png'
-        )
-    )
-    report_g.add_section(
-        ReportObject(
-            'case1222222', True,
-            'alkdsjhfal\nkjsdhfaljkfd', 'aa.png'
-        )
-    )
-    report_g.add_section(
-        ReportObject(
-            'case333333331', False,
-            'alkdsjhfal\nkjsdhfaljkfd', 'aa.png'
-        )
-    )
-    print(report_g.build())
+            _result_file.write(MODULE_TEMPLATE)
