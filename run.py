@@ -1,6 +1,6 @@
 from appium_client.appium_client import AppiumClient
 from conf import DEVICE_LIST, RESULT_DIR
-from test_report_system.generator import Generator
+from html_builder.generator import Generator
 import os
 import sys
 
@@ -22,7 +22,7 @@ if __name__ == '__main__':
     # coming soon...
 
     # start test
-    AppiumClient(DEVICE_LIST).run(TEST_SUITE)
+    # AppiumClient(DEVICE_LIST).run(TEST_SUITE)
 
     # build report
     Generator(RESULT_DIR).build()

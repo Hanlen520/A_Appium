@@ -14,6 +14,6 @@ WAIT_TIME = 3
 # 配置机器
 DEVICE_LIST = {
     'device1': (
-        'CU4LEIT445HIMRAQ',
+        '0123456789ABCDEF',
     )
 }

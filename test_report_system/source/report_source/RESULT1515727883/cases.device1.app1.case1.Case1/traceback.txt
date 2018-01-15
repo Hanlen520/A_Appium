@@ -1,8 +1,0 @@
-Traceback (most recent call last):
-  File "D:\python\A_Appium_dev\appium_client\appium_case.py", line 75, in run_test
-    self.run()
-  File "D:\python\A_Appium_dev\cases\device1\app1\case1.py", line 11, in run
-    self.test_case1()
-  File "D:\python\A_Appium_dev\cases\device1\app1\case1.py", line 8, in test_case1
-    assert(False)
-AssertionError
