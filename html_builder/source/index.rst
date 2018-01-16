@@ -8,7 +8,6 @@ A_Appium TestReport System
 
 .. toctree::
    :maxdepth: 1
-   :caption: Contents:
    :glob:
 
    report_source/RESULT*/*

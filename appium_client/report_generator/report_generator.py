@@ -1,6 +1,21 @@
 MODULE_TEMPLATE = '''
 {dir_name}
 
+Result
+------
+
+
+* Pass: {yes}
+* Error: {no}
+* Total: {total}
+
+Error List
+----------
+
+{error_case}
+
+Detail
+------
 
 .. toctree::
    :maxdepth: 1
@@ -16,7 +31,7 @@ SECTION_TEMPLATE = '''
 
 Time Usage
 ----------
-{time}
+{time} s
 
 
 Test Result
@@ -67,14 +82,19 @@ class ReportGenerator(object):
         # 根目录位置
         self._dir_path = os.path.dirname(self._output_path)
         self._content = list()
+        # 正确/错误 用例的列表
+        self.pass_list = list()
+        self.error_list = list()
 
     @fix_report_object
     def add_section(self, _report_object):
         """ 增加条目 """
         if _report_object.status:
             _template = SECTION_TEMPLATE
+            self.pass_list.append(_report_object)
         else:
             _template = SECTION_TEMPLATE + ERROR_TEMPLATE
+            self.error_list.append(_report_object)
 
         ori_case_name = _report_object.case_name.split(os.sep)[-1]
         case_name = ori_case_name + '\n' + '='*len(ori_case_name)
@@ -105,7 +125,20 @@ class ReportGenerator(object):
     def build(self):
         """ 构建报告 """
         with open(self._output_path, 'w+') as _result_file:
+            # title
             _dir_path = self._dir_path.split(os.sep)[-1]
             _dir_path = '{}\n{}'.format(_dir_path, len(_dir_path)*'=')
-            _content = MODULE_TEMPLATE.format(dir_name=_dir_path)
+            # data analysis
+            _pass_case_num = len(self.pass_list)
+            _error_case_num = len(self.error_list)
+            _total_num = _pass_case_num + _error_case_num
+            _error_case_list = ''.join(['* {}'.format(each.case_name) for each in self.error_list])
+            # write in
+            _content = MODULE_TEMPLATE.format(
+                dir_name=_dir_path,
+                yes=_pass_case_num,
+                no=_error_case_num,
+                total=_total_num,
+                error_case=_error_case_list,
+            )
             _result_file.write(_content)
