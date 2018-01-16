@@ -21,7 +21,7 @@
 - 这套系统最佳实践应该部署在服务器上，提供网页给用户交互与展示。
     - 在前端选择需要执行的用例，向服务器发送任务（0%）
     - 服务器对任务拆包、测试并输出.rst格式结果（80%）
-    - 用sphinx或其他方法将结果嵌入到网页中展示、导出（40%）
+    - 用sphinx或其他方法将结果嵌入到网页中展示、导出（80%）
 
 ## 设计架构 ##
 
@@ -86,7 +86,7 @@ appium遵从C/S模型：
         - adb.py 
             - adb操作类
     - report_generator包
-        - 生成html报告
+        - 根据result结果生成.rst文件
     - appium_case.py
         - 测试用例单元
     - console_utils.py
@@ -100,8 +100,8 @@ appium遵从C/S模型：
         - 测试报告（htmltestrunner生成）
         - 控制台上的log
         - 手机log（MTK/QC等）
-- test_report_system
-    - html报告制作包
+- html_builder
+    - html报告制作包, 基于sphinx
 - case
     - 测试用例的位置
     - 根据自己需要创建文件夹结构
