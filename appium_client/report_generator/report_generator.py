@@ -1,6 +1,6 @@
 MODULE_TEMPLATE = '''
-CASES REPORT
-============
+{dir_name}
+
 
 .. toctree::
    :maxdepth: 1
@@ -13,6 +13,10 @@ CASES REPORT
 
 SECTION_TEMPLATE = '''
 {case_name}
+
+Time Usage
+----------
+{time}
 
 
 Test Result
@@ -33,7 +37,7 @@ Traceback
 ScreenShot
 ----------
 
-.. image:: {case_name}/screenshot.png
+.. image:: screenshot.png
 
 '''
 
@@ -47,9 +51,10 @@ def fix_report_object(func):
     def call_it(_, _object):
         _result = ReportObject(
             case_name = _object.case_name if _object.case_name else 'Default case',
-            status = _object.status if _object.status else True,
+            status = _object.status,
             traceback = _object.traceback if _object.traceback else '',
-            screenshot = _object.screenshot if _object.screenshot else ''
+            screenshot = _object.screenshot if _object.screenshot else '',
+            time_cost = _object.time_cost
         )
         return func(_, _result)
     return call_it
@@ -71,20 +76,24 @@ class ReportGenerator(object):
         else:
             _template = SECTION_TEMPLATE + ERROR_TEMPLATE
 
-        ori_case_name = _report_object.case_name
+        ori_case_name = _report_object.case_name.split(os.sep)[-1]
         case_name = ori_case_name + '\n' + '='*len(ori_case_name)
 
         status = 'OK' if _report_object.status else 'ERROR'
-        status = '**{}**'.format(status)
+        if status == 'OK':
+            status = '**{}**'.format(status)
+        else:
+            status = '*{}*'.format(status)
 
         traceback_str = ('\n' + _report_object.traceback).replace('\n', '\n'+' '*4)
-        screen_path = _report_object.screenshot
+        time_cost = _report_object.time_cost
 
         html_content = _template.format(
             case_name=case_name,
             status=status,
-            screenshot=screen_path,
+            screenshot=ori_case_name,
             traceback=traceback_str,
+            time=time_cost
         )
 
         _case_result_path = os.path.join(self._dir_path, ori_case_name, 'result.rst')
@@ -96,4 +105,7 @@ class ReportGenerator(object):
     def build(self):
         """ 构建报告 """
         with open(self._output_path, 'w+') as _result_file:
-            _result_file.write(MODULE_TEMPLATE)
+            _dir_path = self._dir_path.split(os.sep)[-1]
+            _dir_path = '{}\n{}'.format(_dir_path, len(_dir_path)*'=')
+            _content = MODULE_TEMPLATE.format(dir_name=_dir_path)
+            _result_file.write(_content)

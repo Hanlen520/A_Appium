@@ -29,3 +29,4 @@ class Generator(object):
         os.chdir(GENERATOR_DIR)
         os.system('make html')
         os.chdir(os.getcwd())
+

@@ -1,0 +1,48 @@
+div.document{
+    position: relative;
+    width: 90%;
+    height: 100%;
+    padding-bottom: 50px;
+}
+div.sphinxsidebar{
+    width: 20%;
+}
+div.bodywrapper{
+    margin-left: 20%;
+}
+div.footer{
+    height: 30px;
+    width: 100%;
+    position: fixed;
+    bottom: 0px;
+    margin: 0px;
+    background-color: #f2f2f2;
+    color: #333;
+    padding-top: 20px;
+    text-align:center;
+}
+dt{
+    background-color: #FAF3E8;
+    font-size: 130%;
+}
+p{
+    font-size: 120%;
+}
+a{
+    font-size: 120%;
+}
+pre{
+    font-size: 110%;
+}
+
+strong{
+    background-color: #00A000;
+    font-size: large;
+    color: #ffffff;
+}
+
+em{
+    background-color: #cc0000;
+    font-size: large;
+    color: #ffffff;
+}

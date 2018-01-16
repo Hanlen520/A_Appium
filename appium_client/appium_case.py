@@ -3,8 +3,9 @@ from conf import API_DIR
 from collections import namedtuple
 import traceback
 import os
+import time
 
-ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot'])
+ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot', 'time_cost'])
 
 
 class AppiumCase(object):
@@ -70,6 +71,7 @@ class AppiumCase(object):
     @timer
     def run_test(self):
         """ 执行用例的流程 """
+        _inner_timer = time.time()
         try:
             self.prepare()
             self.run()
@@ -84,7 +86,8 @@ class AppiumCase(object):
                     self.case_name,
                     self._status,
                     self._traceback,
-                    self._screenshot
+                    self._screenshot,
+                    str(round(time.time() - _inner_timer, 3))
                 )
             )
             self.clean_up()
@@ -95,11 +98,15 @@ class AppiumCase(object):
         self._status = False
 
         self._screenshot = os.path.join(self.case_log_dir, 'screenshot.png')
-        self._traceback = traceback.print_exc()
+        self._traceback = traceback.format_exc()
 
         self.device.get_screen_shot(self._screenshot)
-        traceback.print_exc(file=open(os.path.join(self.case_log_dir, 'traceback.txt'), 'w+'))
+
+        with open(os.path.join(self.case_log_dir, 'traceback.txt'), 'w+') as f:
+            f.write(self._traceback)
 
     def _finish(self):
         # no error end
+        if not os.path.exists(self.case_log_dir):
+            os.mkdir(self.case_log_dir)
         self._status = True
