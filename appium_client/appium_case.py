@@ -12,7 +12,7 @@ class AppiumCase(object):
     app_package = None
     app_activity = None
 
-    def __init__(self, _device_object, _case_name, _log_dir, _app_name, _report_generator):
+    def __init__(self, _device_object, _case_name, _log_dir, _app_name, _report_generator, _device_list):
         # driver对象
         self.driver = None
         # 方便打log
@@ -31,6 +31,11 @@ class AppiumCase(object):
         self.api = self._init_api(_app_name, self.driver)
         # 报告制造
         self._report_generator = _report_generator
+        # 该系列设备列表
+        self.device_list = _device_list
+
+        # 使用其他设备
+        # other_driver = self.device_list[1].driver
 
         # 截图与traceback
         self._screenshot = None

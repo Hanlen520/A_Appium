@@ -82,7 +82,8 @@ class AppiumClient(object):
                 raise(ValueError('{} don\'t have enough device'.format(_device_type)))
 
             # 默认取第一台设备作为主测机
-            _device_object = self.device_list[_device_type][0]
+            _device_list = self.device_list[_device_type]
+            _device_object = _device_list[0]
             _device_object.bind(each_case)
 
             # 向appium_case对象传入参数，开始测试
@@ -91,7 +92,8 @@ class AppiumClient(object):
                 _case_name=each_case.case_name,
                 _log_dir=_log_dir,
                 _app_name=each_case.app_name,
-                _report_generator=self.report_generator
+                _report_generator=self.report_generator,
+                _device_list=_device_list
             ).run_test()
 
             # 每轮测试过后的等待时间

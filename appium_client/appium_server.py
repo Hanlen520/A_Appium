@@ -18,7 +18,7 @@ if 'linux' in sys.platform:
     export ANDROID_HOME=%s
     export JAVA_HOME=%s
     export NODE_HOME=%s
-    export PATH=$JAVA_HOME/bin:$ANROID_HOME:$NODE_HOME:$PATH
+    export PATH=$JAVA_HOME/bin:$ANDROID_HOME:$NODE_HOME:$PATH
 
     ''' % (ANDROID_HOME, JAVA_HOME, APPIUM_HOME)
 else:
