@@ -1,3 +1,12 @@
+"""
+整个自动化框架的入口，暂时分为两个部分
+- 测试模块
+    - AppiumClient
+- 结果展示模块
+    - html_builder
+
+"""
+
 from appium_client.appium_client import AppiumClient
 from conf import DEVICE_LIST, RESULT_DIR
 from html_builder.generator import Generator

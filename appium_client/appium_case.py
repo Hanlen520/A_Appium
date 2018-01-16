@@ -1,3 +1,6 @@
+"""
+所有api的基类
+"""
 from .console_utils import logi, log_printer, timer, import_class, module_to_class_name
 from conf import API_DIR
 from collections import namedtuple

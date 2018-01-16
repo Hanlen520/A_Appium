@@ -9,6 +9,7 @@ SOURCE_DIR = os.path.join(GENERATOR_DIR, 'source', 'report_source')
 
 @log_printer('load result files')
 def load_result(_ori_dir, _target_dir):
+    """ 将rst文件从result文件夹迁移到source目录下 """
     _target_dir_list = os.listdir(_target_dir)
     for each in os.listdir(_ori_dir):
         if each.startswith('RESULT') and each not in _target_dir_list:
@@ -26,6 +27,7 @@ class Generator(object):
 
     @log_printer('build html report')
     def build(self):
+        """ 构建html页面 """
         os.chdir(GENERATOR_DIR)
         os.system('make html')
         os.chdir(os.getcwd())

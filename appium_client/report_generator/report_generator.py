@@ -1,3 +1,9 @@
+from functools import wraps
+from appium_client.appium_case import ReportObject
+import os
+
+
+# 每轮测试的报告主模板
 MODULE_TEMPLATE = '''
 {dir_name}
 
@@ -25,7 +31,7 @@ Detail
    cases*/result
 '''
 
-
+# 每条测试用例对应的rst模板
 SECTION_TEMPLATE = '''
 {case_name}
 
@@ -41,6 +47,7 @@ Test Result
 
 '''
 
+# 错误时需要在模板中加入traceback与screenshot部分
 ERROR_TEMPLATE = '''
 Traceback
 ---------
@@ -57,11 +64,8 @@ ScreenShot
 '''
 
 
-
-from functools import wraps
-from appium_client.appium_case import ReportObject
-import os
 def fix_report_object(func):
+    """ 修正report_object防止信息异常 """
     @wraps(func)
     def call_it(_, _object):
         _result = ReportObject(

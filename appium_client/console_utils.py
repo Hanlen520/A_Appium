@@ -1,3 +1,6 @@
+"""
+一些杂的函数
+"""
 from functools import wraps
 import logging
 import datetime
