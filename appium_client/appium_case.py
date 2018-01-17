@@ -88,6 +88,9 @@ class AppiumCase(object):
     def run_test(self):
         """ 执行用例的流程 """
         _inner_timer = time.time()
+        if not os.path.exists(self.case_log_dir):
+            os.mkdir(self.case_log_dir)
+
         try:
             self.prepare()
             self.run()
@@ -123,6 +126,4 @@ class AppiumCase(object):
 
     def _finish(self):
         # no error end
-        if not os.path.exists(self.case_log_dir):
-            os.mkdir(self.case_log_dir)
         self._status = True

@@ -1,5 +1,5 @@
 # ANDROID HOME 位置
-ANDROID_HOME = ''
+ANDROID_HOME = '/home/tester/SDK'
 JAVA_HOME = ''
 APPIUM_HOME = ''
 

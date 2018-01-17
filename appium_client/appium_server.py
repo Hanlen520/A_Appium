@@ -8,8 +8,8 @@ import os
 import time
 
 # 端口范围
-PORT_LIST = list(range(25000, 26000))
-BOOTSTRAP_PORT_LIST = list(range(26001, 27000))
+PORT_BEGIN = 25000
+PORT_END = 30000
 
 # 环境配置
 START_TIME_LIMIT = 200
@@ -78,6 +78,7 @@ class AppiumServer(object):
             _arg_dict['device_id'], _arg_dict['device_name']
         )
         _desired_caps['platformName'] = 'Android'
+        _desired_caps['udid'] = _arg_dict['device_id']
         _desired_caps['platformVersion'] = _arg_dict['system_version']
         _desired_caps['appPackage'] = _arg_dict['app_package']
         _desired_caps['appActivity'] = _arg_dict['app_activity']
@@ -85,6 +86,7 @@ class AppiumServer(object):
         _desired_caps['noReset'] = True
         _desired_caps['stopAppAtEnd'] = False
         _desired_caps['autoUnlock'] = True
+        _desired_caps['autoLaunch'] = True
         _desired_caps['newCommandTimeout'] = 600
 
         return _desired_caps
@@ -93,8 +95,8 @@ class AppiumServer(object):
     def start(self):
         """ 启动服务端 """
         while True:
-            port_num = random.choice(PORT_LIST)
-            bootstrap_port_num = random.choice(BOOTSTRAP_PORT_LIST)
+            port_num = random.randint(PORT_BEGIN, PORT_END)
+            bootstrap_port_num = random.randint(PORT_BEGIN, PORT_END)
 
             _cmd = SERVER_COMMAND.format(
                 port = port_num,
