@@ -9,7 +9,12 @@ import os
 import time
 
 # 用例对象，包含：设备类型、用例模块对象、用例名称、应用名称
-TestCaseObject = namedtuple('TestCaseObject', ['device_type', 'module_object', 'case_name', 'app_name'])
+TestCaseObject = namedtuple(
+    'TestCaseObject', [
+        'device_type', 'module_object', 'case_name', 'app_name'
+    ]
+)
+
 sys.path.insert(0, os.path.abspath(CASE_DIR))
 
 

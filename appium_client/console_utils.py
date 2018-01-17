@@ -1,5 +1,5 @@
 """
-一些杂的函数
+一些通用函数
 """
 from functools import wraps
 import logging

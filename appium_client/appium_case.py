@@ -8,7 +8,11 @@ import traceback
 import os
 import time
 
-ReportObject = namedtuple('ReportObject', ['case_name', 'status', 'traceback', 'screenshot', 'time_cost'])
+ReportObject = namedtuple(
+    'ReportObject', [
+        'case_name', 'status', 'traceback', 'screenshot', 'time_cost'
+    ]
+)
 
 
 class AppiumCase(object):
@@ -44,6 +48,8 @@ class AppiumCase(object):
         self._screenshot = None
         self._traceback = None
 
+    # 改写中主要会暴露出来的三个方法
+
     @log_printer('preparing ...')
     def prepare(self):
         """ 测试前的准备 """
@@ -57,6 +63,8 @@ class AppiumCase(object):
     def run(self):
         """ 在用例中重写这个函数以安排测试入口 """
         pass
+
+    # end
 
     @staticmethod
     def _init_api(_app_name, _driver):
