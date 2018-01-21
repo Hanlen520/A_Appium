@@ -1,4 +1,5 @@
 # A_Appium（Building...）
+[![codebeat badge](https://codebeat.co/badges/7ee7d536-3c4a-413e-b9cb-cd42de40dde1)](https://codebeat.co/projects/github-com-williamfzc-a_appium-master)
 
 **Android_Appium or A-level Appium**
 
