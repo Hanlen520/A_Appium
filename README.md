@@ -71,7 +71,28 @@ appium遵从C/S模型：
     - 根据用例所属类型分配设备
     - case中操作设备进行测试
     
-    
+### 执行 ###
+
+- AppiumClient
+	- device_list（Device）
+		- server
+		- adb
+		- driver（from selenium）
+	- TestCaseObject
+		- load case info
+		- load device_list
+		- load report builder
+	- AppiumCase   
+		- load TestCaseObject
+		- get exact appium case content
+		- run 
+	- ReportGenerator
+		- build .rst result file
+	- HtmlBuilder
+		- use sphinx
+		- transform .rst into html page
+
+
 ## 文件结构 ##
 
 - appium_client  
