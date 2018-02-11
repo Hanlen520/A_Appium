@@ -1,4 +1,6 @@
+# 一个最最简单的使用appium client进行操作的例子
 from appium_client.appium import webdriver
+import subprocess
 
 
 # a simple example
@@ -18,7 +20,6 @@ desired_caps['newCommandTimeout'] = 600
 
 # start server
 server_cmd = ' appium -p 26270 -bp 27235 -U 45O7E6TOSCF659LB --local-timezone  --command-timeout 1200 --log-timestamp  --session-override '
-import subprocess
 server = subprocess.Popen(server_cmd, shell=True)
 
 # init driver
