@@ -34,10 +34,14 @@
 
 ### appium的原理 ###
 
-appium遵从C/S模型：
-1. 调用appium client封装的driver对象的方法组成用例
-1. appium client传送指令给appium server
-1. appium server对设备进行实际操作
+appium遵从C/S模型，实际上它本身就是个HTTPServer。测试流程如下：
+
+1. 调用appium client封装的方法编写用例脚本
+1. 运行脚本，传送HTTP指令给appium server
+1. appium server构建会话，根据desired_cap为会话创建对应的driver（android/ios等），建立长连接
+1. 根据client发来的HTTP请求通过driver发给设备
+1. 设备解析命令（如android会解析成uiautomator命令），并执行，完成后返回结果
+
 
 ### 定位 ###
 
