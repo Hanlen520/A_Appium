@@ -78,23 +78,27 @@ appium遵从C/S模型，实际上它本身就是个HTTPServer。测试流程如�
 ### 执行 ###
 
 - AppiumClient
-	- device_list（Device）
+	- device_list
+	    - 由一系列Device对象构成
+	- Device
 		- server
 		- adb
 		- driver（from selenium）
-	- TestCaseObject
-		- load case info
-		- load device_list
-		- load report builder
+	- TestCaseObject（大部分是文本数据，没有实际动作）
+		- 选定机型id
+		- 用例模块名
+		- 载入用例的内容（类）
 	- AppiumCase   
-		- load TestCaseObject
-		- get exact appium case content
-		- run 
+		- 读入TestCaseObject
+		    - 根据机型id从device_list读入对应Device对象
+		    - 载入用例对象
+		- 绑定报告生成器
+		- 暴露run方法以便在其他地方运行 
 	- ReportGenerator
-		- build .rst result file
+		- 根据case的结果生成一系列.rst文件
 	- HtmlBuilder
-		- use sphinx
-		- transform .rst into html page
+		- 基于sphinx引擎
+		- 将.rst文件编译成html包
 
 
 ## 文件结构 ##
